@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GeoGIF</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #08090d;
+    color: white;
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    width: min(720px, 92%);
+    margin: auto;
+    padding: 30px 0 60px;
+}
+
+.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 14px;
+    letter-spacing: 5px;
+    font-weight: bold;
+    color: #999;
+}
+
+button {
+    border: 0;
+    border-radius: 12px;
+    padding: 13px 18px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.login-btn {
+    background: #191a21;
+    color: white;
+    border: 1px solid #30323d;
+}
+
+h1 {
+    font-size: clamp(45px, 10vw, 75px);
+    letter-spacing: -5px;
+    margin: 55px 0 10px;
+}
+
+.subtitle {
+    color: #92949f;
+    line-height: 1.5;
+}
+
+.card {
+    margin-top: 25px;
+    background: #101116;
+    border: 1px solid #282a34;
+    border-radius: 22px;
+    padding: 18px;
+}
+
+.drop {
+    min-height: 250px;
+    border: 2px dashed #393b46;
+    border-radius: 17px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    cursor: pointer;
+}
+
+.drop:hover {
+    background: #15161d;
+}
+
+.drop-icon {
+    font-size: 42px;
+}
+
+.drop strong {
+    display: block;
+    font-size: 18px;
+    margin-top: 8px;
+}
+
+.drop span {
+    display: block;
+    color: #777985;
+    font-size: 13px;
+    margin-top: 8px;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.actions button {
+    flex: 1;
+    background: #191a21;
+    color: white;
+    border: 1px solid #30323d;
+}
+
+.status {
+    display: none;
+    padding: 14px;
+    margin-top: 13px;
+    border-radius: 13px;
+    font-size: 14px;
+}
+
+.status.show {
+    display: block;
+}
+
+.error {
+    background: #32161a;
+    color: #ffb8bf;
+}
+
+.success {
+    background: #14251d;
+    color: #b9f1d0;
+}
+
+.info {
+    background: #171923;
+    color: #c8cad5;
+}
+
+.preview {
+    display: none;
+    margin-top: 15px;
+}
+
+.preview.show {
+    display: block;
+}
+
+.preview img {
+    width: 100%;
+    max-height: 430px;
+    object-fit: contain;
+    background: #050507;
+    border-radius: 15px;
+}
+
+.make {
+    width: 100%;
+    margin-top: 12px;
+    background: white;
+    color: black;
+}
+
+.note {
+    color: #646671;
+    font-size: 12px;
+    line-height: 1.5;
+    margin-top: 16px;
+}
+
+/* LOGIN */
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #000c;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 10;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.panel {
+    width: min(430px, 100%);
+    background: #101116;
+    border: 1px solid #2b2d38;
+    border-radius: 20px;
+    padding: 22px;
+}
+
+.panel h2 {
+    margin-top: 0;
+}
+
+.field {
+    width: 100%;
+    padding: 14px;
+    margin: 7px 0;
+    background: #181920;
+    border: 1px solid #30323d;
+    color: white;
+    border-radius: 10px;
+}
+
+.submit {
+    width: 100%;
+    margin-top: 10px;
+    background: white;
+    color: black;
+}
+
+.close {
+    float: right;
+    background: none;
+    color: #aaa;
+    font-size: 22px;
+}
+
+/* ADMIN */
+
+.admin {
+    display: none;
+    position: fixed;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: min(520px, 94vw);
+    background: #0d0e13;
+    border-left: 1px solid #292b35;
+    z-index: 20;
+    padding: 22px;
+    overflow-y: auto;
+}
+
+.admin.show {
+    display: block;
+}
+
+.log {
+    background: #17181f;
+    border: 1px solid #292b35;
+    border-radius: 14px;
+    padding: 10px;
+    margin: 10px 0;
+}
+
+.log img {
+    width: 100%;
+    border-radius: 10px;
+}
+
+.small {
+    color: #777985;
+    font-size: 12px;
+    margin-top: 6px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="top">
+        <div class="logo">GEOGIF</div>
+
+        <button class="login-btn" onclick="openLogin()">
+            Login
+        </button>
+    </div>
+
+    <h1>Photo → GIF</h1>
+
+    <p class="subtitle">
+        Turn a photo into a short GIF directly from your phone.
+    </p>
+
+    <div class="card">
+
+        <label class="drop" id="dropArea">
+
+            <input
+                id="fileInput"
+                type="file"
+                accept="image/*"
+                capture="environment"
+            >
+
+            <div>
+                <div class="drop-icon">＋</div>
+
+                <strong>
+                    Take or choose a photo
+                </strong>
+
+                <span>
+                    Camera or photo library
+                </span>
+            </div>
+
+        </label>
+
+        <div class="actions">
+
+            <button onclick="takePhoto()">
+                Take Photo
+            </button>
+
+            <button onclick="choosePhoto()">
+                Choose Photo
+            </button>
+
+        </div>
+
+        <div
+            id="status"
+            class="status"
+        ></div>
+
+        <div
+            id="preview"
+            class="preview"
+        >
+
+            <img
+                id="previewImage"
+                alt="Selected photo"
+            >
+
+            <button
+                class="make"
+                id="makeGif"
+            >
+                Make GIF
+            </button>
+
+        </div>
+
+        <div class="note">
+            Photos are processed locally in the browser.
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- LOGIN -->
+
+<div
+    id="loginModal"
+    class="modal"
+>
+
+    <div class="panel">
+
+        <button
+            class="close"
+            onclick="closeLogin()"
+        >
+            ×
+        </button>
+
+        <h2>Login</h2>
+
+        <input
+            id="username"
+            class="field"
+            placeholder="Username"
+        >
+
+        <input
+            id="password"
+            class="field"
+            type="password"
+            placeholder="Password"
+        >
+
+        <button
+            class="submit"
+            onclick="login()"
+        >
+            Login
+        </button>
+
+        <div
+            id="loginStatus"
+            class="status"
+        ></div>
+
+    </div>
+
+</div>
+
+
+<!-- ADMIN LOGS -->
+
+<div
+    id="adminPanel"
+    class="admin"
+>
+
+    <button
+        class="close"
+        onclick="closeAdmin()"
+    >
+        ×
+    </button>
+
+    <h2>Logs</h2>
+
+    <p class="small">
+        Moderation uploads from this browser session.
+    </p>
+
+    <div id="logs"></div>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.js"></script>
+
+<script>
+
+const fileInput =
+    document.getElementById("fileInput");
+
+const dropArea =
+    document.getElementById("dropArea");
+
+const statusBox =
+    document.getElementById("status");
+
+const preview =
+    document.getElementById("preview");
+
+const previewImage =
+    document.getElementById("previewImage");
+
+const makeGifButton =
+    document.getElementById("makeGif");
+
+const logs =
+    document.getElementById("logs");
+
+let selectedFile = null;
+
+let moderationLogs = [];
+
+
+/* DEVICE CHECK */
+
+function isPhone() {
+
+    return /Android|iPhone|iPad|iPod|Mobile/i
+        .test(navigator.userAgent)
+
+        ||
+
+        (
+            navigator.maxTouchPoints > 1
+            &&
+            /Macintosh/i.test(navigator.userAgent)
+        );
+
+}
+
+
+function checkPhone() {
+
+    if (!isPhone()) {
+
+        showStatus(
+            "Only on phone currently sorry. Please open this site on your phone.",
+            "error"
+        );
+
+        return false;
+
+    }
+
+    return true;
+
+}
+
+
+/* FILE PICKING */
+
+function takePhoto() {
+
+    if (!checkPhone())
+        return;
+
+    fileInput.setAttribute(
+        "capture",
+        "environment"
+    );
+
+    fileInput.click();
+
+}
+
+
+function choosePhoto() {
+
+    if (!checkPhone())
+        return;
+
+    fileInput.removeAttribute(
+        "capture"
+    );
+
+    fileInput.click();
+
+}
+
+
+dropArea.onclick = () => {
+
+    if (!checkPhone())
+        return;
+
+    fileInput.click();
+
+};
+
+
+fileInput.onchange = event => {
+
+    const file =
+        event.target.files[0];
+
+    if (!file)
+        return;
+
+    handlePhoto(file);
+
+};
+
+
+/* PHOTO */
+
+function handlePhoto(file) {
+
+    if (!file.type.startsWith("image/")) {
+
+        showStatus(
+            "Please choose an image.",
+            "error"
+        );
+
+        return;
+
+    }
+
+    selectedFile = file;
+
+    previewImage.src =
+        URL.createObjectURL(file);
+
+    preview.classList.add("show");
+
+    showStatus(
+        "Photo ready.",
+        "success"
+    );
+
+
+    /*
+      This creates a local moderation preview.
+
+      For a real website, send this to your
+      authenticated backend only after explicit
+      upload/retention consent.
+    */
+
+    moderationLogs.unshift({
+
+        image:
+            previewImage.src,
+
+        time:
+            new Date().toLocaleString()
+
+    });
+
+    moderationLogs =
+        moderationLogs.slice(0, 25);
+
+}
+
+
+/* STATUS */
+
+function showStatus(
+    message,
+    type
+) {
+
+    statusBox.textContent =
+        message;
+
+    statusBox.className =
+        "status show " + type;
+
+}
+
+
+/* GIF */
+
+makeGifButton.onclick = () => {
+
+    if (!selectedFile)
+        return;
+
+    makeGifButton.disabled =
+        true;
+
+    showStatus(
+        "Making GIF...",
+        "info"
+    );
+
+    const image =
+        new Image();
+
+    image.onload = () => {
+
+        const maxSize = 700;
+
+        const scale =
+            Math.min(
+                1,
+                maxSize /
+                Math.max(
+                    image.naturalWidth,
+                    image.naturalHeight
+                )
+            );
+
+        const width =
+            Math.round(
+                image.naturalWidth * scale
+            );
+
+        const height =
+            Math.round(
+                image.naturalHeight * scale
+            );
+
+
+        const canvas =
+            document.createElement(
+                "canvas"
+            );
+
+        canvas.width =
+            width;
+
+        canvas.height =
+            height;
+
+
+        const ctx =
+            canvas.getContext("2d");
+
+
+        const gif =
+            new GIF({
+
+                workers: 2,
+
+                quality: 10,
+
+                width: width,
+
+                height: height,
+
+                workerScript:
+                    "https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.worker.js"
+
+            });
+
+
+        for (
+            let frame = 0;
+            frame < 8;
+            frame++
+        ) {
+
+            ctx.clearRect(
+                0,
+                0,
+                width,
+                height
+            );
+
+
+            const zoom =
+                1 + frame * 0.008;
+
+
+            ctx.save();
+
+            ctx.translate(
+                width / 2,
+                height / 2
+            );
+
+            ctx.scale(
+                zoom,
+                zoom
+            );
+
+            ctx.translate(
+                -width / 2,
+                -height / 2
+            );
+
+
+            ctx.drawImage(
+                image,
+                0,
+                0,
+                width,
+                height
+            );
+
+            ctx.restore();
+
+
+            gif.addFrame(
+                canvas,
+                {
+                    copy: true,
+                    delay: 90
+                }
+            );
+
+        }
+
+
+        gif.on("finished", blob => {
+
+            const url =
+                URL.createObjectURL(blob);
+
+
+            const download =
+                document.createElement("a");
+
+            download.href =
+                url;
+
+            download.download =
+                "geogif.gif";
+
+            download.textContent =
+                "Download GIF";
+
+            download.style.display =
+                "block";
+
+            download.style.textAlign =
+                "center";
+
+            download.style.marginTop =
+                "14px";
+
+            download.style.color =
+                "white";
+
+            download.style.fontWeight =
+                "bold";
+
+
+            preview.appendChild(
+                download
+            );
+
+
+            showStatus(
+                "Done.",
+                "success"
+            );
+
+            makeGifButton.disabled =
+                false;
+
+        });
+
+
+        gif.render();
+
+    };
+
+
+    image.src =
+        URL.createObjectURL(
+            selectedFile
+        );
+
+};
+
+
+/* LOGIN */
+
+function openLogin() {
+
+    document
+        .getElementById("loginModal")
+        .classList.add("show");
+
+}
+
+
+function closeLogin() {
+
+    document
+        .getElementById("loginModal")
+        .classList.remove("show");
+
+}
+
+
+function login() {
+
+    const username =
+        document.getElementById(
+            "username"
+        ).value;
+
+    const password =
+        document.getElementById(
+            "password"
+        ).value;
+
+
+    const loginStatus =
+        document.getElementById(
+            "loginStatus"
+        );
+
+
+    /*
+      DEMO ONLY.
+
+      Do NOT use hardcoded credentials
+      on a production website.
+    */
+
+    if (
+        username === "admin01"
+        &&
+        password === "password123"
+    ) {
+
+        closeLogin();
+
+        openAdmin();
+
+    }
+
+    else {
+
+        loginStatus.textContent =
+            "Invalid username or password.";
+
+        loginStatus.className =
+            "status show error";
+
+    }
+
+}
+
+
+/* ADMIN */
+
+function openAdmin() {
+
+    document
+        .getElementById("adminPanel")
+        .classList.add("show");
+
+    renderLogs();
+
+}
+
+
+function closeAdmin() {
+
+    document
+        .getElementById("adminPanel")
+        .classList.remove("show");
+
+}
+
+
+function renderLogs() {
+
+    logs.innerHTML = "";
+
+
+    if (
+        moderationLogs.length === 0
+    ) {
+
+        logs.innerHTML =
+            "<p class='small'>No photos yet.</p>";
+
+        return;
+
+    }
+
+
+    moderationLogs.forEach(
+        (entry, index) => {
+
+            const div =
+                document.createElement(
+                    "div"
+                );
+
+            div.className =
+                "log";
+
+
+            const image =
+                document.createElement(
+                    "img"
+                );
+
+            image.src =
+                entry.image;
+
+
+            const info =
+                document.createElement(
+                    "div"
+                );
+
+            info.className =
+                "small";
+
+            info.textContent =
+                "Photo " +
+                (index + 1) +
+                " · " +
+                entry.time;
+
+
+            div.appendChild(image);
+
+            div.appendChild(info);
+
+            logs.appendChild(div);
+
+        }
+    );
+
+}
+
+</script>
+
+</body>
+</html>
