@@ -94,8 +94,8 @@
     document.getElementById("uploadBtn").onclick = () => document.getElementById("fileInput").click();
     document.getElementById("cameraBtn").onclick = () => document.getElementById("cameraInput").click();
 
-    document.getElementById("fileInput").onchange = e => e.target.files[0 0]);
-    document.getElementById("cameraInput").onchange = e => e.target.files[0 0]);
+ document.getElementById("fileInput").onchange = e => handleFile(e.target.files[0]);
+document.getElementById("cameraInput").onchange = e => handleFile(e.target.files[0]);
   </script>
 </body>
 </html>
